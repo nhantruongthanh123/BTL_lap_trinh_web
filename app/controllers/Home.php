@@ -7,13 +7,9 @@ class Home extends BaseController {
     }
 
     public function index() {
-        $data = $this->model->getList();
-        echo "Home Page<br>";
-        
-        echo "<pre>";
-        print_r($data);
-        echo "</pre>";
+        $this->render('Block/header', ['title' => 'Trang chủ - Bookstore']);
+        $this->render('Home/index');
+        $this->render('Block/footer');
     }
-
 }
 ?>

@@ -16,7 +16,6 @@ class BaseController {
 
     public function render($view, $data = []){
         extract($data);
-
         if (file_exists(ROOT . '/app/views/' . $view . '.php')){
             require_once ROOT . '/app/views/' . $view . '.php';
         }

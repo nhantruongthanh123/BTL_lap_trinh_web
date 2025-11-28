@@ -7,7 +7,7 @@ class Product extends BaseController {
         $this->model = $this->model('ProductModel');
     }
 
-    public function list_product() {
+    public function index() {
         $data = $this->model->getList();
 
         // Render view with data
@@ -17,7 +17,11 @@ class Product extends BaseController {
     }
 
     public function detail() {
-        $this->render('Product/detail');
+        $this->data['info'] = "/product/detail";
+        $this->data['content']['pageTitle'] = "Product Detail Page";
+        $this->data['content']['product'] = $this->model->getDetail(1);
+        $this->render('Layout/client_layout', $this->data);
+
     }
 }
 ?>

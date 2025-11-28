@@ -6,6 +6,7 @@ class App{
 
     function __construct(){
         global $routes;
+
         $this->__controller = $routes['default_controller'];
         $this->__action = 'index';
         $this->__params = [];
@@ -25,6 +26,7 @@ class App{
 
     public function handlerUrl(){
         $url = $this->getUrl();
+
         $urlarr = array_filter(explode('/',$url));
         $urlarr = array_values($urlarr);
         
