@@ -1,0 +1,37 @@
+.card {
+    transition: all 0.3s ease-in-out; /* Tạo chuyển động mượt trong 0.3 giây */
+    border: 1px solid rgba(0,0,0,0.1); /* Viền mờ nhẹ */
+}
+
+/* 2. Khi di chuột vào (HOVER) */
+.card:hover {
+    transform: translateY(-10px); /* Nhấc thẻ sách bay lên 5px */
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15) !important; /* Đổ bóng đen đậm hơn */
+    border-color: #0d6efd; /* Đổi màu viền sang xanh dương */
+    cursor: pointer; /* Đổi con trỏ chuột thành hình bàn tay */
+}
+
+/* 3. Hiệu ứng phóng to ảnh bên trong (Optional) */
+.card .card-img-top {
+    transition: transform 0.5s ease;
+}
+
+.card:hover .card-img-top {
+    transform: scale(1.2); /* Phóng to ảnh lên 5% */
+}
+
+@media (min-width: 992px) {
+    
+    /* Khi di chuột vào thẻ li chứa class dropdown */
+    .dropdown:hover .dropdown-menu {
+        display: block; /* Hiện menu ngay lập tức */
+        margin-top: 0; /* Xóa khoảng cách để chuột không bị hụt */
+        animation: fadeIn 0.3s ease; /* Thêm hiệu ứng hiện từ từ cho đẹp */
+    }
+
+    /* Tùy chỉnh hiệu ứng xuất hiện */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+}

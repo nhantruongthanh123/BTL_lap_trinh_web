@@ -40,7 +40,7 @@ INSERT INTO books (title, isbn, author_id, publisher_id, category_id, descriptio
 ('Mắt Biếc', 'VN-001', 1, 1, 1, 'Một câu chuyện tình yêu buồn và đẹp nhất của Nguyễn Nhật Ánh.', 110000, 99000, 50, 'mat-biec.jpg', 1, 300),
 
 -- Sách 2: Nguyễn Nhật Ánh - Kính Vạn Hoa
-('Kính Vạn Hoa - Tập 1', 'VN-002', 1, 2, 4, 'Những câu chuyện học trò tinh nghịch của Quý ròm, nhỏ Hạnh và Tiểu Long.', 85000, 85000, 100, 'kinh-van-hoa.jpg', 0, 200),
+('Kính Vạn Hoa - Tập 1', 'VN-002', 1, 2, 4, 'Những câu chuyện học trò tinh nghịch của Quý ròm, nhỏ Hạnh và Tiểu Long.', 85000, 85000, 100, 'kinh-van-hoa-tap-1.jpg', 0, 200),
 
 -- Sách 3: Rosie Nguyễn (ID 2) - Kỹ năng (ID 3)
 ('Tuổi trẻ đáng giá bao nhiêu?', 'VN-003', 2, 3, 3, 'Cuốn sách best-seller khuyên các bạn trẻ hãy sống hết mình.', 80000, 60000, 200, 'tuoi-tre-dang-gia-bao-nhieu.jpg', 1, 250),

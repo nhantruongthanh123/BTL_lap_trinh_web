@@ -9,7 +9,7 @@
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     
-    <link rel="stylesheet" href="<?php echo WEBROOT; ?>/public/css/style.css">
+    <link rel="stylesheet" href="<?php echo WEBROOT; ?>/public/assets/Clients/css/style.css">
 </head>
 <body class="d-flex flex-column min-vh-100">
 
@@ -28,9 +28,35 @@
         <li class="nav-item">
             <a class="nav-link active" href="<?php echo WEBROOT; ?>">Trang chủ</a>
         </li>
-        <li class="nav-item">
-            <a class="nav-link" href="<?php echo WEBROOT; ?>/product">Sản phẩm</a>
+
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="<?php echo WEBROOT; ?>/product" 
+               id="productDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Sản phẩm
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="productDropdown">
+                <li>
+                    <a class="dropdown-item fw-bold text-primary" href="<?php echo WEBROOT; ?>/product">
+                        <i class="fas fa-th me-2"></i>Tất cả sản phẩm
+                    </a>
+                </li>
+                <li><hr class="dropdown-divider"></li>
+                
+                <?php if (!empty($data['categories'])): ?>
+                    <?php foreach ($data['categories'] as $category): ?>
+                        <li>
+                            <a class="dropdown-item" href="<?php echo WEBROOT; ?>/product/category/<?php echo htmlspecialchars($category['slug']); ?>">
+                                <i class="fas fa-book me-2"></i><?php echo htmlspecialchars($category['category_name']); ?>
+                            </a>
+                        </li>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <li><span class="dropdown-item text-muted">Chưa có danh mục</span></li>
+                <?php endif; ?>
+            </ul>
         </li>
+
+
         <li class="nav-item">
             <a class="nav-link" href="#">Giới thiệu</a>
         </li>

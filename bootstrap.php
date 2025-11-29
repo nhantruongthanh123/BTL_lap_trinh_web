@@ -17,10 +17,9 @@ $webroot .= $folder;
 define('WEBROOT', $webroot);
 
 
-
-
 require_once 'app/config/routes.php';
 require_once 'app/config/database.php';
 require_once 'app/config/app.php';
 require_once 'core/BaseController.php';
+require_once 'core/BaseModel.php';
 

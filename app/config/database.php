@@ -21,6 +21,7 @@ class Database {
             
             $this->conn = new PDO($dsn, DB_USER, DB_PASS, $options);
         } catch(PDOException $e) {
+            require_once __DIR__ . '/../errors/404.php';
             die("Kết nối database thất bại: " . $e->getMessage());
         }
     }
