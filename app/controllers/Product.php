@@ -2,26 +2,50 @@
 class Product extends BaseController {
     public $model;
     public $data;
+    public $categoryModel;
 
     public function __construct() {
         $this->model = $this->model('ProductModel');
+        $this->categoryModel = $this->model('CategoryModel');
     }
 
     public function index() {
-        $data = $this->model->getList();
+        $products = $this->model->getAllProducts();
+        $categories = $this->categoryModel->getAllCategories();
 
-        // Render view with data
-        $this->data['productData'] = $data;
-        $this->data['pageTitle'] = "Product List";
-        $this->render('Product/list', $this->data);
+        $data = [
+            'products' => $products,
+            'categories' => $categories,
+            'page'     => 'product',
+            'title' => 'Tất cả sản phẩm - Bookstore'
+        ];
+
+        $this->render('Block/header', $data);
+        $this->render('Product/index', $data);
+        $this->render('Block/footer');
     }
 
-    public function detail() {
-        $this->data['info'] = "/product/detail";
-        $this->data['content']['pageTitle'] = "Product Detail Page";
-        $this->data['content']['product'] = $this->model->getDetail(1);
-        $this->render('Layout/client_layout', $this->data);
-
+    public function category($slug) {
+        $products = $this->model->getProductsByCategory($slug);
+        $categories = $this->categoryModel->getAllCategories();
+        
+        $categoryName = 'Danh mục sản phẩm';
+        foreach ($categories as $cat) {
+            if ($cat['slug'] === $slug) {
+                $categoryName = $cat['category_name'];
+                break;
+            }
+        }
+        $data = [
+            'products' => $products,
+            'categories' => $categories,
+            'page'     => 'product',
+            'title' => $categoryName . ' - Bookstore'
+        ];
+        
+        $this->render('Block/header', $data);
+        $this->render('Product/index', $data);
+        $this->render('Block/footer');
     }
 }
 ?>

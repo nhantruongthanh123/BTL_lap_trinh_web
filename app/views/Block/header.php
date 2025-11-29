@@ -26,12 +26,16 @@
     <div class="collapse navbar-collapse" id="mainMenu">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item">
-            <a class="nav-link active" href="<?php echo WEBROOT; ?>">Trang chủ</a>
+            <a class="nav-link <?php echo (isset($page) && $page === 'home') ? 'active' : ''; ?>" 
+                href="<?php echo WEBROOT; ?>">
+                Trang chủ
+            </a>
         </li>
 
         <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="<?php echo WEBROOT; ?>/product" 
-               id="productDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <a class="nav-link dropdown-toggle <?php echo (isset($page) && $page === 'product') ? 'active' : ''; ?>" 
+                href="<?php echo WEBROOT; ?>/product" 
+                id="productDropdown">
                 Sản phẩm
             </a>
             <ul class="dropdown-menu" aria-labelledby="productDropdown">
@@ -58,10 +62,10 @@
 
 
         <li class="nav-item">
-            <a class="nav-link" href="#">Giới thiệu</a>
+            <a class="nav-link <?php echo (isset($page) && $page === 'about') ? 'active' : ''; ?>" href="#">Giới thiệu</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="#">Liên hệ</a>
+            <a class="nav-link <?php echo (isset($page) && $page === 'contact') ? 'active' : ''; ?>" href="#">Liên hệ</a>
         </li>
       </ul>
       

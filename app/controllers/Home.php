@@ -10,7 +10,11 @@ class Home extends BaseController {
 
     public function index() {
         $categories = $this->categoryModel->getAllCategories();
-        $this->render('Block/header', ['title' => 'Trang chủ - Bookstore', 'categories' => $categories]);
+        $data = [   'title' => 'Trang chủ - Bookstore', 
+                    'page'     => 'home',
+                    'categories' => $categories];
+
+        $this->render('Block/header', $data);
         $this->render('Home/index', ['products' => $this->model->getListBooks(8)]);
         $this->render('Block/footer');
     }
