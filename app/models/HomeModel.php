@@ -4,7 +4,13 @@ class HomeModel extends BaseModel {
     protected $table = 'books';
 
     public function getListBooks($limit = 10){
-        $sql = "SELECT * FROM {$this->table} ORDER BY created_at DESC LIMIT :limit";
+        $sql = "SELECT b.*, a.author_name, c.category_name
+                FROM {$this->table} b
+                LEFT JOIN authors a ON b.author_id = a.author_id
+                LEFT JOIN categories c ON b.category_id = c.category_id
+                WHERE b.is_active = 1
+                ORDER BY b.created_at DESC 
+                LIMIT :limit";
 
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);

@@ -47,5 +47,31 @@ class Product extends BaseController {
         $this->render('Product/index', $data);
         $this->render('Block/footer');
     }
+
+    public function detail($bookId) {
+        $book = $this->model->getBookById($bookId);
+        if (!$book) {
+            require_once ROOT . '../errors/404.php';
+            exit;
+        }
+
+        $relatedBooks = $this->model->getRelatedBooks($book['category_id'], $bookId);
+        $categories = $this->categoryModel->getAllCategories();
+        
+        $data = [
+            'book' => $book,
+            'relatedBooks' => $relatedBooks,
+            'categories' => $categories,
+            'page'     => 'product',
+            'title' => $book['title'] . ' - Bookstore'
+        ];
+
+        
+
+        $this->render('Block/header', $data);
+        $this->render('Product/detail', $data);
+        $this->render('Block/footer');
+    }
+
 }
 ?>
