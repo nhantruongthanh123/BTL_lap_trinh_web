@@ -70,10 +70,19 @@
       </ul>
       
       <div class="d-flex align-items-center gap-3">
-        <form class="d-flex" role="search">
+        <form class="d-flex" role="search" method="GET" action="<?php echo WEBROOT; ?>/product/search">
             <div class="input-group input-group-sm">
-                <input class="form-control" type="search" placeholder="Tìm sách..." aria-label="Search">
-                <button class="btn btn-light" type="submit"><i class="fas fa-search"></i></button>
+                <input class="form-control" 
+                    type="search" 
+                    name="q" 
+                    placeholder="Tìm sách..." 
+                    aria-label="Search"
+                    value="<?php echo isset($_GET['q']) ? htmlspecialchars($_GET['q']) : ''; ?>"
+                    required
+                    minlength="2">
+                <button class="btn btn-light" type="submit">
+                    <i class="fas fa-search"></i>
+                </button>
             </div>
         </form>
 

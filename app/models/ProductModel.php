@@ -67,4 +67,32 @@ class ProductModel extends BaseModel {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function searchBooks($keyword, $limit = 20) {
+        $sql = "SELECT b.*, a.author_name, c.category_name
+                FROM {$this->table} b
+                LEFT JOIN authors a ON b.author_id = a.author_id
+                LEFT JOIN categories c ON b.category_id = c.category_id
+                WHERE b.is_active = 1 
+                AND (
+                    b.title LIKE :keyword1 
+                    OR a.author_name LIKE :keyword2
+                    OR b.isbn LIKE :keyword3
+                    OR b.description LIKE :keyword4
+                )
+                ORDER BY b.created_at DESC
+                LIMIT :limit";
+        
+        $stmt = $this->db->prepare($sql);
+        $keyword = trim($keyword);
+        $searchTerm = '%' . $keyword . '%';
+        $stmt->bindValue(':keyword1', $searchTerm, PDO::PARAM_STR);
+        $stmt->bindValue(':keyword2', $searchTerm, PDO::PARAM_STR);
+        $stmt->bindValue(':keyword3', $searchTerm, PDO::PARAM_STR);
+        $stmt->bindValue(':keyword4', $searchTerm, PDO::PARAM_STR);
+        $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
+        $stmt->execute();
+        
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
 }

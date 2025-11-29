@@ -73,5 +73,28 @@ class Product extends BaseController {
         $this->render('Block/footer');
     }
 
+    public function search() {
+        $keyword = isset($_GET['q']) ? trim($_GET['q']) : '';
+        if (empty($keyword)) {
+            header("Location: " . WEBROOT . "/product");
+            exit;
+        }
+
+        $products = $this->model->searchBooks($keyword);
+        $categories = $this->categoryModel->getAllCategories();
+
+        $data = [
+            'products' => $products,
+            'categories' => $categories,
+            'keyword' => $keyword,
+            'page' => 'product',
+            'title' => 'Kết quả tìm kiếm: "' . htmlspecialchars($keyword) . '" - Bookstore'
+        ];
+        
+        $this->render('Block/header', $data);
+        $this->render('Product/search', $data);
+        $this->render('Block/footer');
+    }
+
 }
 ?>
