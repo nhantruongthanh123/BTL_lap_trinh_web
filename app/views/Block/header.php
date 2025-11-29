@@ -93,9 +93,109 @@
             </span>
         </a>
         
-        <a href="<?php echo WEBROOT; ?>/user/login" class="btn btn-light btn-sm fw-bold text-primary">
-            Đăng nhập
-        </a>
+        <?php if (isset($_SESSION['user_id'])): ?>
+            <!-- ĐÃ ĐĂNG NHẬP - Hiển thị Avatar và Menu -->
+            <div class="dropdown">
+                <button class="btn btn-light dropdown-toggle d-flex align-items-center gap-2" 
+                        type="button" 
+                        id="userDropdown" 
+                        data-bs-toggle="dropdown" 
+                        aria-expanded="false">
+                    <!-- Avatar -->
+                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" 
+                         style="width: 35px; height: 35px; font-size: 14px; font-weight: bold;">
+                        <?php 
+                            $fullName = $_SESSION['full_name'] ?? $_SESSION['username'];
+                            // Lấy chữ cái đầu của tên
+                            $firstLetter = mb_substr($fullName, 0, 1, 'UTF-8');
+                            echo strtoupper($firstLetter);
+                        ?>
+                    </div>
+                    <!-- Tên user -->
+                    <span class="fw-bold text-dark d-none d-md-inline">
+                        <?php echo htmlspecialchars($fullName); ?>
+                    </span>
+                </button>
+
+                <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="userDropdown">
+                    <!-- Header với thông tin user -->
+                    <li class="px-3 py-2 border-bottom">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" 
+                                 style="width: 40px; height: 40px; font-size: 16px; font-weight: bold;">
+                                <?php echo strtoupper($firstLetter); ?>
+                            </div>
+                            <div>
+                                <div class="fw-bold text-dark"><?php echo htmlspecialchars($fullName); ?></div>
+                                <small class="text-muted"><?php echo htmlspecialchars($_SESSION['email']); ?></small>
+                            </div>
+                        </div>
+                    </li>
+
+                    <!-- Nếu là Admin - Hiển thị link vào Dashboard -->
+                    <?php if ($_SESSION['role'] === 'admin'): ?>
+                        <li>
+                            <a class="dropdown-item text-danger fw-bold" href="<?php echo WEBROOT; ?>/admin">
+                                <i class="fas fa-tachometer-alt me-2"></i>Quản trị hệ thống
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                    <?php endif; ?>
+
+                    <!-- Menu cho User thường -->
+                    <li>
+                        <a class="dropdown-item" href="<?php echo WEBROOT; ?>/user/profile">
+                            <i class="fas fa-user me-2"></i>Thông tin tài khoản
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="<?php echo WEBROOT; ?>/user/orders">
+                            <i class="fas fa-shopping-bag me-2"></i>Đơn hàng của tôi
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="<?php echo WEBROOT; ?>/user/changePassword">
+                            <i class="fas fa-key me-2"></i>Đổi mật khẩu
+                        </a>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <a class="dropdown-item text-danger" href="<?php echo WEBROOT; ?>/user/logout">
+                            <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+        <?php else: ?>
+            <!-- CHƯA ĐĂNG NHẬP - Hiển thị nút đăng nhập -->
+            <div class="dropdown">
+                <a class="btn btn-primary dropdown-toggle fw-bold" 
+                   href="#" 
+                   role="button" 
+                   id="loginDropdown" 
+                   data-bs-toggle="dropdown" 
+                   aria-expanded="false">
+                    <i class="fas fa-user-circle me-1"></i> Đăng nhập
+                </a>
+
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="loginDropdown">
+                    <li><h6 class="dropdown-header">Chọn vai trò đăng nhập</h6></li>
+                    <li>
+                        <a class="dropdown-item" href="<?php echo WEBROOT; ?>/user/login">
+                            <i class="fas fa-user-alt me-2"></i>Thành viên/Khách
+                        </a>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <a class="dropdown-item fw-bold" href="<?php echo WEBROOT; ?>/admin/login">
+                            <i class="fas fa-user-shield me-2"></i>Quản trị viên
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        <?php endif; ?>
+
       </div>
     </div>
   </div>
