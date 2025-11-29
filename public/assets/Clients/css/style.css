@@ -1,10 +1,10 @@
-.card {
+.hover-card {
     transition: all 0.3s ease-in-out; /* Tạo chuyển động mượt trong 0.3 giây */
     border: 1px solid rgba(0,0,0,0.1); /* Viền mờ nhẹ */
 }
 
 /* 2. Khi di chuột vào (HOVER) */
-.card:hover {
+.hover-card:hover {
     transform: translateY(-10px); /* Nhấc thẻ sách bay lên 5px */
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15) !important; /* Đổ bóng đen đậm hơn */
     border-color: #0d6efd; /* Đổi màu viền sang xanh dương */
@@ -12,11 +12,11 @@
 }
 
 /* 3. Hiệu ứng phóng to ảnh bên trong (Optional) */
-.card .card-img-top {
+.hover-card .card-img-top {
     transition: transform 0.5s ease;
 }
 
-.card:hover .card-img-top {
+.hover-card:hover .card-img-top {
     transform: scale(1.2); /* Phóng to ảnh lên 5% */
 }
 

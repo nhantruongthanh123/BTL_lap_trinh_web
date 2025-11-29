@@ -4,10 +4,10 @@ $relatedBooks = $data['relatedBooks'];
 
 // Xử lý ảnh
 $imgName = !empty($book['cover_image']) ? $book['cover_image'] : 'default-book.jpg';
-$imgPath = WEBROOT . '/public/images/books/' . $imgName;
+$imgPath = WEBROOT . '/public/images/' . $imgName;
 
 // Tính giá
-$hasDiscount = $book['discount_price'];
+$hasDiscount = isset($book['discount_price']) && $book['discount_price'] !== null && (float)$book['discount_price'] < (float)$book['price'];
 $finalPrice = $hasDiscount ? $book['discount_price'] : $book['price'];
 
 ?>
@@ -87,7 +87,7 @@ $finalPrice = $hasDiscount ? $book['discount_price'] : $book['price'];
                         </div>
                         <del class="text-muted"><?php echo number_format($book['price'], 0, ',', '.'); ?>đ</del>
                     <?php else: ?>
-                        <h2 class="text-primary fw-bold mb-0"><?php echo number_format($finalPrice, 0, ',', '.'); ?>đ</h2>
+                        <h2 class="text-danger fw-bold mb-0"><?php echo number_format($finalPrice, 0, ',', '.'); ?>đ</h2>
                     <?php endif; ?>
                 </div>
             </div>
@@ -151,35 +151,44 @@ $finalPrice = $hasDiscount ? $book['discount_price'] : $book['price'];
     <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
         <?php foreach ($relatedBooks as $relatedBook): ?>
             <?php 
-                $relatedImg = !empty($relatedBook['cover_image']) ? $relatedBook['cover_image'] : 'default-book.jpg';
-                $relatedImgPath = WEBROOT . '/public/images/books/' . $relatedImg;
+                $relatedImgName = !empty($relatedBook['cover_image']) ? $relatedBook['cover_image'] : 'default-book.jpg';
+                $relatedImgPath = WEBROOT . '/public/images/' . $relatedImgName;
                 
-                $relatedHasDiscount = !empty($relatedBook['discount_price']) && $relatedBook['discount_price'] < $relatedBook['price'];
+                $relatedHasDiscount = isset($relatedBook['discount_price']) && $relatedBook['discount_price'] !== null && (float)$relatedBook['discount_price'] < (float)$relatedBook['price'];
                 $relatedFinalPrice = $relatedHasDiscount ? $relatedBook['discount_price'] : $relatedBook['price'];
+                $relatedOriginalPrice = isset($relatedBook['price']) ? (float)$relatedBook['price'] : 0;
             ?>
             <div class="col">
                 <div class="card h-100 shadow-sm">
-                    <div class="position-relative overflow-hidden" style="height: 300px;">
-                        <img src="<?php echo $relatedImgPath; ?>" 
-                             class="card-img-top w-100 h-100 object-fit-cover" 
-                             alt="<?php echo htmlspecialchars($relatedBook['title']); ?>"
-                             onerror="this.src='<?php echo WEBROOT; ?>/public/images/default-book.jpg'">
-                        <?php if ($relatedHasDiscount): ?>
-                            <span class="position-absolute top-0 end-0 badge bg-danger m-2">
-                                -<?php echo round((($relatedBook['price'] - $relatedBook['discount_price']) / $relatedBook['price']) * 100); ?>%
-                            </span>
-                        <?php endif; ?>
-                    </div>
+                    <a href="<?php echo WEBROOT; ?>/product/detail/<?php echo (int)$relatedBook['book_id']; ?>" class="text-decoration-none">
+                        <div class="position-relative overflow-hidden" style="height: 300px;">
+                            <img src="<?php echo htmlspecialchars($relatedImgPath, ENT_QUOTES); ?>" 
+                                class="card-img-top w-100 h-100 object-fit-cover" 
+                                alt="<?php echo htmlspecialchars($relatedBook['title']); ?>"
+                                onerror="this.src='<?php echo WEBROOT; ?>/public/images/default-book.jpg'">
+                            <?php if ($relatedHasDiscount): ?>
+                                <span class="position-absolute top-0 start-0 badge bg-danger m-2">Giảm giá</span>
+                            <?php endif; ?>
+                        </div>
+                    </a>
                     <div class="card-body">
                         <h6 class="card-title text-truncate">
-                            <a href="<?php echo WEBROOT; ?>/product/detail/<?php echo $relatedBook['book_id']; ?>" 
-                               class="text-decoration-none text-dark fw-bold">
+                            <a href="<?php echo WEBROOT; ?>/product/detail/<?php echo (int)$relatedBook['book_id']; ?>" 
+                            class="text-decoration-none text-dark fw-bold">
                                 <?php echo htmlspecialchars($relatedBook['title']); ?>
                             </a>
                         </h6>
-                        <p class="text-danger fw-bold mb-0">
-                            <?php echo number_format($relatedFinalPrice, 0, ',', '.'); ?>đ
-                        </p>
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="text-danger fw-bold">
+                                <?php echo number_format($relatedFinalPrice, 0, ',', '.'); ?>đ
+                            </span>
+                            <?php if ($relatedHasDiscount): ?>
+                                <small class="text-decoration-line-through text-muted">
+                                    <?php echo number_format($relatedOriginalPrice, 0, ',', '.'); ?>đ
+                                </small>
+                            <?php endif; ?>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -188,19 +197,3 @@ $finalPrice = $hasDiscount ? $book['discount_price'] : $book['price'];
     <?php endif; ?>
 </div>
 
-<script>
-function increaseQty() {
-    let qty = document.getElementById('quantity');
-    let max = parseInt(qty.max);
-    if (parseInt(qty.value) < max) {
-        qty.value = parseInt(qty.value) + 1;
-    }
-}
-
-function decreaseQty() {
-    let qty = document.getElementById('quantity');
-    if (parseInt(qty.value) > 1) {
-        qty.value = parseInt(qty.value) - 1;
-    }
-}
-</script>
