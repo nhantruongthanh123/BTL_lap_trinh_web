@@ -1,9 +1,11 @@
 <?php
 class User extends BaseController {
     private $userModel;
+    private $categoryModel;
 
     public function __construct() {
         $this->userModel = $this->model('UserModel');
+        $this->categoryModel = $this->model('CategoryModel');
     }
 
     public function register(){
@@ -229,5 +231,227 @@ class User extends BaseController {
         $this->render('Block/header', $data);
         $this->render('User/registerSuccess', $data);
         $this->render('Block/footer');
+    }
+
+    public function profile() {
+        if (!isset($_SESSION['user_id'])) {
+            header('Location: ' . WEBROOT . '/user/login');
+            exit();
+        }
+
+        $userId = $_SESSION['user_id'];
+        $user = $this->userModel->getUserById($userId);
+
+        if (!$user) {
+            session_destroy();
+            $_SESSION['login_error'] = 'Tài khoản không tồn tại hoặc đã bị vô hiệu hóa.';
+            header('Location: ' . WEBROOT . '/user/login');
+            exit();
+        }
+
+        $successMessage = $_SESSION['profile_success'] ?? '';
+        $errorMessage = $_SESSION['profile_error'] ?? '';
+
+        unset($_SESSION['profile_success']);
+        unset($_SESSION['profile_error']);
+
+
+
+        $data = [
+        'title' => 'Thông tin tài khoản - Bookstore',
+        'page' => 'profile',
+        'categories' => $this->categoryModel->getAllCategories(),
+        'user' => $user,
+        'success' => $successMessage,
+        'error' => $errorMessage,
+        'active_tab' => 'profile'
+        ];
+
+        $this->render('Block/header', $data);
+        $this->render('Block/sidebar_customer', $data);
+        $this->render('User/profile', $data); 
+        $this->render('Block/footer');
+    }
+
+    public function updateProfile() {
+        if (!isset($_SESSION['user_id'])) {
+            header('Location: ' . WEBROOT . '/user/login');
+            exit();
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: ' . WEBROOT . '/user/profile');
+            exit();
+        }
+
+        $userId = $_SESSION['user_id'];
+
+        $day = $_POST['day'] ?? '';
+        $month = $_POST['month'] ?? '';
+        $year = $_POST['year'] ?? '';
+        
+        $birthday = null;
+        if (!empty($day) && !empty($month) && !empty($year)) {
+            $birthday = sprintf('%04d-%02d-%02d', $year, $month, $day);
+        }
+        
+        $data = [
+            'full_name' => trim($_POST['full_name'] ?? ''),
+            'email' => trim($_POST['email'] ?? ''),
+            'gender' => $_POST['gender'] ?? null,
+            'birthday' => $birthday ?? null,
+            'phone' => trim($_POST['phone'] ?? ''),
+            'address' => trim($_POST['address'] ?? '')
+        ];
+
+        // VALIDATE
+        if (empty($data['full_name']) || empty($data['email'])) {
+            $_SESSION['profile_error'] = 'Họ tên và email không được để trống.';
+            header('Location: ' . WEBROOT . '/user/profile');
+            exit();
+        }
+
+        if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+            $_SESSION['profile_error'] = 'Email không hợp lệ.';
+            header('Location: ' . WEBROOT . '/user/profile');
+            exit();
+        }
+
+        // Validate birthday
+        if (!empty($data['birthday']) && strtotime($data['birthday']) > time()) {
+            $_SESSION['profile_error'] = 'Ngày sinh không hợp lệ.';
+            header('Location: ' . WEBROOT . '/user/profile');
+            exit();
+        }
+
+        if ($this->userModel->updateProfile($userId, $data)) {
+            $_SESSION['full_name'] = $data['full_name']; 
+            $_SESSION['email'] = $data['email'];
+            $_SESSION['profile_success'] = 'Cập nhật thông tin thành công!';
+        } else {
+            $_SESSION['profile_error'] = 'Cập nhật thất bại. Vui lòng thử lại.';
+        }
+
+        header('Location: ' . WEBROOT . '/user/profile');
+        exit();
+    }
+
+    public function changePassword() {
+        if (!isset($_SESSION['user_id'])) {
+            header('Location: ' . WEBROOT . '/user/login');
+            exit();
+        }
+
+        $userId = $_SESSION['user_id'];
+        $user = $this->userModel->getUserById($userId);
+
+        if (!$user) {
+            session_destroy();
+            $_SESSION['login_error'] = 'Tài khoản không tồn tại hoặc đã bị vô hiệu hóa.';
+            header('Location: ' . WEBROOT . '/user/login');
+            exit();
+        }
+
+        // Lấy thông báo
+        $successMessage = $_SESSION['password_success'] ?? '';
+        $errorMessage = $_SESSION['password_error'] ?? '';
+        $errors = $_SESSION['password_errors'] ?? [];
+
+        unset($_SESSION['password_success']);
+        unset($_SESSION['password_error']);
+        unset($_SESSION['password_errors']);
+
+        $data = [
+            'title' => 'Đổi mật khẩu - Bookstore',
+            'page' => 'changePassword',
+            'categories' => $this->categoryModel->getAllCategories(),
+            'user' => $user,
+            'success' => $successMessage,
+            'error' => $errorMessage,
+            'errors' => $errors,
+            'active_tab' => 'password'
+        ];
+
+        $this->render('Block/header', $data);
+        $this->render('Block/sidebar_customer', $data);
+        $this->render('User/changePassword', $data);
+        $this->render('Block/footer');
+    }
+
+    public function changePasswordProcess() {
+        // Kiểm tra đăng nhập
+        if (!isset($_SESSION['user_id'])) {
+            header('Location: ' . WEBROOT . '/user/login');
+            exit();
+        }
+
+        // Chỉ chấp nhận POST
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: ' . WEBROOT . '/user/changePassword');
+            exit();
+        }
+
+        $userId = $_SESSION['user_id'];
+
+        // Lấy dữ liệu từ form
+        $currentPassword = $_POST['current_password'] ?? '';
+        $newPassword = $_POST['new_password'] ?? '';
+        $confirmPassword = $_POST['confirm_password'] ?? '';
+
+        $errors = [];
+
+        // VALIDATE
+        if (empty($currentPassword)) {
+            $errors['current_password'] = 'Vui lòng nhập mật khẩu hiện tại.';
+        }
+
+        if (empty($newPassword)) {
+            $errors['new_password'] = 'Vui lòng nhập mật khẩu mới.';
+        } elseif (strlen($newPassword) < 6) {
+            $errors['new_password'] = 'Mật khẩu mới phải có ít nhất 6 ký tự.';
+        }
+
+        if (empty($confirmPassword)) {
+            $errors['confirm_password'] = 'Vui lòng xác nhận mật khẩu mới.';
+        } elseif ($newPassword !== $confirmPassword) {
+            $errors['confirm_password'] = 'Mật khẩu xác nhận không khớp.';
+        }
+
+        // Nếu có lỗi validate
+        if (!empty($errors)) {
+            $_SESSION['password_errors'] = $errors;
+            header('Location: ' . WEBROOT . '/user/changePassword');
+            exit();
+        }
+
+        // Lấy thông tin user từ database
+        $user = $this->userModel->getUserById($userId);
+
+        // Kiểm tra mật khẩu hiện tại có đúng không
+        if (!password_verify($currentPassword, $user['password_hash'])) {
+            $_SESSION['password_error'] = 'Mật khẩu hiện tại không đúng.';
+            header('Location: ' . WEBROOT . '/user/changePassword');
+            exit();
+        }
+
+        // Kiểm tra mật khẩu mới không giống mật khẩu cũ
+        if ($currentPassword === $newPassword) {
+            $_SESSION['password_error'] = 'Mật khẩu mới phải khác mật khẩu hiện tại.';
+            header('Location: ' . WEBROOT . '/user/changePassword');
+            exit();
+        }
+
+        // Mã hóa mật khẩu mới
+        $newPasswordHash = password_hash($newPassword, PASSWORD_DEFAULT);
+
+        // Cập nhật mật khẩu
+        if ($this->userModel->updatePassword($userId, $newPasswordHash)) {
+            $_SESSION['password_success'] = 'Đổi mật khẩu thành công!';
+        } else {
+            $_SESSION['password_error'] = 'Đổi mật khẩu thất bại. Vui lòng thử lại.';
+        }
+
+        header('Location: ' . WEBROOT . '/user/changePassword');
+        exit();
     }
 }

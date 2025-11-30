@@ -40,12 +40,57 @@ class UserModel extends BaseModel {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    public function getUserById($user_id) {
+        $sql = "SELECT user_id, username, email, role, full_name, gender, birthday, phone, address, password_hash
+                FROM " . $this->table . " 
+                WHERE user_id = :user_id AND is_active = 1";
+                
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':user_id', $user_id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function updateProfile($userId, $data) {
+        $sql = "UPDATE " . $this->table . " 
+                SET full_name = :full_name, 
+                    phone = :phone,
+                    email = :email,
+                    gender = :gender,
+                    birthday = :birthday,
+                    address = :address
+                WHERE user_id = :user_id";
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+            $stmt->bindValue(':full_name', $data['full_name']);
+            $stmt->bindValue(':email', $data['email']);
+            $stmt->bindValue(':gender', $data['gender'] ?? null);
+            $stmt->bindValue(':birthday', $data['birthday'] ?? null);
+            $stmt->bindValue(':phone', $data['phone'] ?? null);
+            $stmt->bindValue(':address', $data['address'] ?? null);
+
+            return $stmt->execute();
+    }
+
     public function isEmailExists($email) {
         $sql = "SELECT COUNT(*) FROM " . $this->table . " WHERE email = :email";
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':email', $email);
         $stmt->execute();
         return $stmt->fetchColumn();
+    }
+
+    public function updatePassword($userId, $newPasswordHash) {
+        $sql = "UPDATE " . $this->table . " 
+                SET password_hash = :password_hash 
+                WHERE user_id = :user_id";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':password_hash', $newPasswordHash);
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+        
+        return $stmt->execute();
     }
 
 

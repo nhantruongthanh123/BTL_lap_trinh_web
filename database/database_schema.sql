@@ -22,6 +22,8 @@ CREATE TABLE users (
     email VARCHAR(100) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     full_name VARCHAR(100) NOT NULL,
+    gender ENUM('male', 'female', 'other') DEFAULT NULL,
+    birthday DATE DEFAULT NULL,
     phone VARCHAR(20),
     address TEXT,
     avatar VARCHAR(255) DEFAULT 'default-avatar.png',
