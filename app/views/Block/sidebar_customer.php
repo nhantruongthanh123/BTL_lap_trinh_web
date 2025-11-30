@@ -4,16 +4,39 @@
         <div class="col-md-3">
             <div class="card border-0 mb-3">
                 <div class="card-body d-flex align-items-center border-bottom pb-3">
-                    <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-3" 
-                        style="width: 50px; height: 50px; font-size: 1.5rem;">
-                        <?php echo strtoupper(substr($_SESSION['username'], 0, 1)); ?>
+                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3" 
+                         style="width: 50px; height: 50px; font-size: 1.5rem; font-weight: bold;">
+                        <?php 
+                            $fullName = $_SESSION['username'];
+                            $avatar = $_SESSION['avatar'] ?? null;
+                            $avatarPath = $avatar ? WEBROOT . '/public/assets/Clients/avatars/' . $avatar : null;
+                            $firstLetter = mb_substr($fullName, 0, 1, 'UTF-8');
+                        ?>
+
+                        <?php if (!empty($avatar)): ?>
+                            <!-- Hiển thị ảnh avatar -->
+                            <img src="<?php echo $avatarPath; ?>" 
+                                alt="Avatar" 
+                                class="rounded-circle" 
+                                style="width: 50px; height: 50px; object-fit: cover; border: 2px solid #fff;">
+                        <?php else: ?>
+                            <!-- Hiển thị chữ cái đầu nếu không có ảnh -->
+                            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" 
+                                style="width: 50px; height: 50px; font-size: 1.5rem; font-weight: bold;">
+                                <?php echo strtoupper($firstLetter); ?>
+                            </div>
+                        <?php endif; ?>
+
                     </div>
+
+                    
                     <div style="overflow: hidden;">
                         <div class="fw-bold text-truncate"><?php echo htmlspecialchars($_SESSION['username']); ?></div>
                         <a href="<?php echo WEBROOT; ?>/user/profile" class="text-decoration-none text-muted small"><i class="fas fa-pen me-1"></i>Sửa hồ sơ</a>
                     </div>
                 </div>
 
+                
                 <div class="mt-3">
                     <ul class="list-unstyled">
                         

@@ -21,7 +21,7 @@
                         </div>
                     <?php endif; ?>
 
-                    <form action="<?php echo WEBROOT; ?>/user/updateProfile" method="POST">
+                    <form action="<?php echo WEBROOT; ?>/user/updateProfile" method="POST" enctype="multipart/form-data">
                         
                         <div class="row mb-3 align-items-center">
                             <label class="col-md-3 text-start text-muted">Tên đăng nhập</label>
@@ -126,6 +126,44 @@
                             </div>
                         </div>
 
+                        <div class="row mb-4 align-items-center">
+                            <label class="col-md-3 text-start text-muted fw-bold">Ảnh đại diện</label>
+                            <div class="col-md-9">
+                                <div class="d-flex align-items-center gap-4">
+                                    <!-- Preview Avatar -->
+                                    <?php 
+                                        $avatar = $user['avatar'] ?? 'default-avatar.png';
+                                        $avatarPath = WEBROOT . '/public/assets/Clients/avatars/' . $avatar;
+                                    ?>
+                                    <img src="<?php echo $avatarPath; ?>" 
+                                         alt="Avatar Preview" 
+                                         id="avatar-preview"
+                                         class="rounded-circle border border-3 border-primary shadow" 
+                                         style="width: 100px; height: 100px; object-fit: cover;">
+                                    
+                                    <!-- Input File -->
+                                    <div class="flex-grow-1">
+                                        <input type="file" 
+                                               class="form-control mb-2" 
+                                               id="avatar-input" 
+                                               name="avatar" 
+                                               accept="image/jpeg,image/png,image/jpg,image/gif">
+                                        <small class="text-muted d-block">
+                                            <i class="fas fa-info-circle me-1"></i>
+                                            Chọn ảnh JPG, PNG, GIF (tối đa 2MB)
+                                        </small>
+                                        <button type="button" 
+                                                class="btn btn-sm btn-outline-danger mt-2" 
+                                                id="remove-avatar">
+                                            <i class="fas fa-trash me-1"></i>Xóa ảnh
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
                         <div class="row">
                             <div class="col-md-3"></div>
                             <div class="col-md-9">
@@ -141,3 +179,49 @@
         </div>
     </div>
 </div>
+
+
+
+<!-- JavaScript Preview Avatar -->
+<script>
+// Preview ảnh khi chọn file
+document.getElementById('avatar-input').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        // Kiểm tra loại file
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif'];
+        if (!allowedTypes.includes(file.type)) {
+            alert('Chỉ chấp nhận file ảnh JPG, PNG, GIF!');
+            this.value = '';
+            return;
+        }
+        
+        // Kiểm tra kích thước (2MB)
+        if (file.size > 2 * 1024 * 1024) {
+            alert('Kích thước file không được vượt quá 2MB!');
+            this.value = '';
+            return;
+        }
+        
+        // Hiển thị preview
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('avatar-preview').src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+document.getElementById('remove-avatar').addEventListener('click', function() {
+    if (confirm('Bạn có chắc muốn xóa ảnh đại diện?')) {
+        document.getElementById('avatar-preview').src = '<?php echo WEBROOT; ?>/public/assets/Clients/avatars/default-avatar.png';
+        document.getElementById('avatar-input').value = '';
+        
+        fetch('<?php echo WEBROOT; ?>/user/removeAvatar', {
+            method: 'POST'
+        }).then(() => {
+            location.reload();
+        });
+    }
+});
+</script>

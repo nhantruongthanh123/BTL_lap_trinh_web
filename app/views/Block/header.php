@@ -94,7 +94,6 @@
         </a>
         
         <?php if (isset($_SESSION['user_id'])): ?>
-            <!-- ĐÃ ĐĂNG NHẬP - Hiển thị Avatar và Menu -->
             <div class="dropdown">
                 <button class="btn btn-light dropdown-toggle d-flex align-items-center gap-2" 
                         type="button" 
@@ -105,11 +104,26 @@
                     <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" 
                          style="width: 35px; height: 35px; font-size: 14px; font-weight: bold;">
                         <?php 
-                            $fullName = $_SESSION['full_name'] ?? $_SESSION['username'];
-                            // Lấy chữ cái đầu của tên
+                            $fullName = $_SESSION['username'];
+                            $avatar = $_SESSION['avatar'] ?? null;
+                            $avatarPath = $avatar ? WEBROOT . '/public/assets/Clients/avatars/' . $avatar : null;
                             $firstLetter = mb_substr($fullName, 0, 1, 'UTF-8');
-                            echo strtoupper($firstLetter);
                         ?>
+
+                        <?php if (!empty($avatar)): ?>
+                            <!-- Hiển thị ảnh avatar -->
+                            <img src="<?php echo $avatarPath; ?>" 
+                                alt="Avatar" 
+                                class="rounded-circle" 
+                                style="width: 35px; height: 35px; object-fit: cover; border: 2px solid #fff;">
+                        <?php else: ?>
+                            <!-- Hiển thị chữ cái đầu nếu không có ảnh -->
+                            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" 
+                                style="width: 35px; height: 35px; font-size: 18px; font-weight: bold;">
+                                <?php echo strtoupper($firstLetter); ?>
+                            </div>
+                        <?php endif; ?>
+
                     </div>
                     <!-- Tên user -->
                     <span class="fw-bold text-dark d-none d-md-inline">

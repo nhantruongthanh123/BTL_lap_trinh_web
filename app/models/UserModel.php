@@ -17,7 +17,7 @@ class UserModel extends BaseModel {
     }
 
     public function findUserByEmail($email) {
-        $sql = "SELECT user_id, username, email, password_hash, role, full_name
+        $sql = "SELECT user_id, username, email, password_hash, role, full_name, avatar
                 FROM " . $this->table . " 
                 WHERE email = :email AND is_active = 1";
                 
@@ -29,7 +29,7 @@ class UserModel extends BaseModel {
     }
 
     public function findUserByUsername($username) {
-        $sql = "SELECT user_id, username, email, password_hash, role, full_name
+        $sql = "SELECT user_id, username, email, password_hash, role, full_name, avatar
                 FROM " . $this->table . " 
                 WHERE username = :username AND is_active = 1";
                 
@@ -41,7 +41,7 @@ class UserModel extends BaseModel {
     }
 
     public function getUserById($user_id) {
-        $sql = "SELECT user_id, username, email, role, full_name, gender, birthday, phone, address, password_hash
+        $sql = "SELECT user_id, username, email, role, full_name, gender, birthday, phone, address, password_hash, avatar
                 FROM " . $this->table . " 
                 WHERE user_id = :user_id AND is_active = 1";
                 
@@ -53,14 +53,26 @@ class UserModel extends BaseModel {
     }
 
     public function updateProfile($userId, $data) {
-        $sql = "UPDATE " . $this->table . " 
-                SET full_name = :full_name, 
-                    phone = :phone,
-                    email = :email,
-                    gender = :gender,
-                    birthday = :birthday,
-                    address = :address
-                WHERE user_id = :user_id";
+        if (isset($data['avatar'])) {
+            $sql = "UPDATE " . $this->table . " 
+                    SET full_name = :full_name, 
+                        phone = :phone,
+                        email = :email,
+                        gender = :gender,
+                        birthday = :birthday,
+                        address = :address,
+                        avatar = :avatar
+                    WHERE user_id = :user_id";
+        } else {
+            $sql = "UPDATE " . $this->table . " 
+                    SET full_name = :full_name, 
+                        phone = :phone,
+                        email = :email,
+                        gender = :gender,
+                        birthday = :birthday,
+                        address = :address
+                    WHERE user_id = :user_id";
+        }
             $stmt = $this->db->prepare($sql);
             $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
             $stmt->bindValue(':full_name', $data['full_name']);
@@ -69,6 +81,10 @@ class UserModel extends BaseModel {
             $stmt->bindValue(':birthday', $data['birthday'] ?? null);
             $stmt->bindValue(':phone', $data['phone'] ?? null);
             $stmt->bindValue(':address', $data['address'] ?? null);
+
+            if (isset($data['avatar'])) {
+                $stmt->bindValue(':avatar', $data['avatar']);
+            }
 
             return $stmt->execute();
     }
@@ -93,5 +109,16 @@ class UserModel extends BaseModel {
         return $stmt->execute();
     }
 
+    public function updateAvatar($userId, $avatarPath) {
+        $sql = "UPDATE " . $this->table . " 
+                SET avatar = :avatar 
+                WHERE user_id = :user_id";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':avatar', $avatarPath);
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+        
+        return $stmt->execute();
+    }
 
 }

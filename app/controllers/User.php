@@ -187,6 +187,7 @@ class User extends BaseController {
             $_SESSION['full_name'] = $user['full_name'];
             $_SESSION['role']      = $user['role']; 
             $_SESSION['email']     = $user['email'];
+            $_SESSION['avatar']    = $user['avatar'];
 
             header('Location: ' . WEBROOT); 
             exit();
@@ -286,6 +287,63 @@ class User extends BaseController {
 
         $userId = $_SESSION['user_id'];
 
+        // ========== XỬ LÝ UPLOAD AVATAR ==========
+        $avatarFileName = null;
+        
+        if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === UPLOAD_ERR_OK) {
+            $allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif'];
+            $maxSize = 2 * 1024 * 1024; // 2MB
+            
+            $fileType = $_FILES['avatar']['type'];
+            $fileSize = $_FILES['avatar']['size'];
+            $tmpName = $_FILES['avatar']['tmp_name'];
+            
+            // 1. VALIDATE LOẠI FILE
+            if (!in_array($fileType, $allowedTypes)) {
+                $_SESSION['profile_error'] = 'Chỉ chấp nhận file ảnh JPG, PNG, GIF.';
+                header('Location: ' . WEBROOT . '/user/profile');
+                exit();
+            }
+            
+            // 2. VALIDATE KÍCH THƯỚC
+            if ($fileSize > $maxSize) {
+                $_SESSION['profile_error'] = 'Kích thước file không được vượt quá 2MB.';
+                header('Location: ' . WEBROOT . '/user/profile');
+                exit();
+            }
+            
+            // 3. TẠO TÊN FILE UNIQUE
+            $extension = pathinfo($_FILES['avatar']['name'], PATHINFO_EXTENSION);
+            $avatarFileName = 'avatar_' . $userId . '_' . time() . '.' . $extension;
+            
+            // 4. ĐƯỜNG DẪN LƯU FILE
+            $uploadDir = __DIR__ . '/../../public/assets/Clients/avatars/';
+            $uploadPath = $uploadDir . $avatarFileName;
+            
+            // 5. TẠO THƯ MỤC NẾU CHƯA TỒN TẠI
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0755, true);
+            }
+            
+            // 6. DI CHUYỂN FILE TỪ TEMP SANG THƯ MỤC ĐÍCH
+            if (!move_uploaded_file($tmpName, $uploadPath)) {
+                $_SESSION['profile_error'] = 'Upload ảnh thất bại. Vui lòng thử lại.';
+                header('Location: ' . WEBROOT . '/user/profile');
+                exit();
+            }
+            
+            // 7. XÓA AVATAR CŨ (nếu không phải default)
+            $currentUser = $this->userModel->getUserById($userId);
+            $oldAvatar = $currentUser['avatar'] ?? null;
+            
+            if ($oldAvatar && $oldAvatar !== 'default-avatar.png') {
+                $oldPath = $uploadDir . $oldAvatar;
+                if (file_exists($oldPath)) {
+                    unlink($oldPath); // Xóa file cũ
+                }
+            }
+        }
+
         $day = $_POST['day'] ?? '';
         $month = $_POST['month'] ?? '';
         $year = $_POST['year'] ?? '';
@@ -304,6 +362,10 @@ class User extends BaseController {
             'address' => trim($_POST['address'] ?? '')
         ];
 
+        if ($avatarFileName) {
+            $data['avatar'] = $avatarFileName;
+        }
+
         // VALIDATE
         if (empty($data['full_name']) || empty($data['email'])) {
             $_SESSION['profile_error'] = 'Họ tên và email không được để trống.';
@@ -318,6 +380,11 @@ class User extends BaseController {
         }
 
         // Validate birthday
+        if ($birthday && !checkdate($month, $day, $year)) {
+            $_SESSION['profile_error'] = 'Ngày sinh không hợp lệ.';
+            header('Location: ' . WEBROOT . '/user/profile');
+            exit();
+        }
         if (!empty($data['birthday']) && strtotime($data['birthday']) > time()) {
             $_SESSION['profile_error'] = 'Ngày sinh không hợp lệ.';
             header('Location: ' . WEBROOT . '/user/profile');
@@ -328,6 +395,9 @@ class User extends BaseController {
             $_SESSION['full_name'] = $data['full_name']; 
             $_SESSION['email'] = $data['email'];
             $_SESSION['profile_success'] = 'Cập nhật thông tin thành công!';
+            if ($avatarFileName) {
+                $_SESSION['avatar'] = $avatarFileName;
+            }
         } else {
             $_SESSION['profile_error'] = 'Cập nhật thất bại. Vui lòng thử lại.';
         }
@@ -452,6 +522,79 @@ class User extends BaseController {
         }
 
         header('Location: ' . WEBROOT . '/user/changePassword');
+        exit();
+    }
+
+
+    public function removeAvatar() {
+        // 1. KIỂM TRA ĐĂNG NHẬP
+        if (!isset($_SESSION['user_id'])) {
+            echo json_encode([
+                'success' => false, 
+                'message' => 'Vui lòng đăng nhập để thực hiện chức năng này.'
+            ]);
+            exit();
+        }
+
+        // 2. CHỈ CHẤP NHẬN POST REQUEST
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            echo json_encode([
+                'success' => false, 
+                'message' => 'Phương thức không hợp lệ.'
+            ]);
+            exit();
+        }
+
+        $userId = $_SESSION['user_id'];
+        
+        // 3. LẤY THÔNG TIN USER HIỆN TẠI
+        $user = $this->userModel->getUserById($userId);
+        
+        if (!$user) {
+            echo json_encode([
+                'success' => false, 
+                'message' => 'Không tìm thấy thông tin người dùng.'
+            ]);
+            exit();
+        }
+
+        $currentAvatar = $user['avatar'] ?? null;
+
+        // 4. XÓA FILE VẬT LÝ (nếu không phải default)
+        if ($currentAvatar && $currentAvatar !== 'default-avatar.png') {
+            $avatarPath = __DIR__ . '/../../public/assets/Clients/avatars/' . $currentAvatar;
+            
+            if (file_exists($avatarPath)) {
+                if (!unlink($avatarPath)) {
+                    echo json_encode([
+                        'success' => false, 
+                        'message' => 'Không thể xóa file ảnh. Vui lòng thử lại.'
+                    ]);
+                    exit();
+                }
+            }
+        }
+
+        // 5. CẬP NHẬT DATABASE - Đổi về default-avatar.png
+        if ($this->userModel->updateAvatar($userId, 'default-avatar.png')) {
+            
+            // 6. CẬP NHẬT SESSION
+            $_SESSION['avatar'] = 'default-avatar.png';
+            
+            // 7. TRẢ VỀ JSON THÀNH CÔNG
+            echo json_encode([
+                'success' => true, 
+                'message' => 'Xóa ảnh đại diện thành công!'
+            ]);
+            
+        } else {
+            // 8. TRẢ VỀ JSON THẤT BẠI
+            echo json_encode([
+                'success' => false, 
+                'message' => 'Cập nhật database thất bại. Vui lòng thử lại.'
+            ]);
+        }
+        
         exit();
     }
 }
