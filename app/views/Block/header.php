@@ -181,6 +181,15 @@
                 </ul>
             </div>
 
+        <?php elseif (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+                <a class="dropdown-item fw-bold text-danger" href="<?php echo WEBROOT; ?>/admin">
+                    <i class="fas fa-cogs me-2"></i>Trang Quản Trị
+                </a>
+            </li>
+        
+
         <?php else: ?>
             <!-- CHƯA ĐĂNG NHẬP - Hiển thị nút đăng nhập -->
             <div class="dropdown">

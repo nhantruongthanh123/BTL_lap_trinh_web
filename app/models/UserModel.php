@@ -121,4 +121,45 @@ class UserModel extends BaseModel {
         return $stmt->execute();
     }
 
+    public function countCustomers() {
+        $sql = "SELECT COUNT(*) as total FROM " . $this->table . " WHERE role = 'customer' AND is_active = 1";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $row['total'];
+    }
+
+    public function countOrders() {
+        $sql = "SELECT COUNT(*) as total FROM orders";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $row['total'];
+    }
+
+    public function countBooks() {
+        $sql = "SELECT COUNT(*) as total FROM books";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $row['total'];
+    }
+    
+    public function sumRevenue() {
+        try {
+            $sql = "SELECT SUM(final_amount) as total_revenue 
+                    FROM " . $this->table . " 
+                    WHERE payment_status = 'paid'";
+                    
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute();
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $result['total_revenue'];
+        }
+        catch (PDOException $e) {
+            return 0;
+        }
+        
+    }
+
 }
