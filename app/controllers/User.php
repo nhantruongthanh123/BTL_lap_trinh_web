@@ -209,7 +209,6 @@ class User extends BaseController {
 
 
     public function registerSuccess() {
-        // Kiểm tra có session success không (tránh truy cập trực tiếp)
         if (!isset($_SESSION['registerSuccess'])) {
             header('Location: ' . WEBROOT . '/user/register');
             exit();
@@ -217,7 +216,6 @@ class User extends BaseController {
         
         $successData = $_SESSION['registerSuccess'];
         
-        // Xóa session sau khi lấy
         unset($_SESSION['registerSuccess']);
         
         $categories = $this->model('CategoryModel')->getAllCategories();
@@ -317,7 +315,7 @@ class User extends BaseController {
             $avatarFileName = 'avatar_' . $userId . '_' . time() . '.' . $extension;
             
             // 4. ĐƯỜNG DẪN LƯU FILE
-            $uploadDir = __DIR__ . '/../../public/assets/Clients/avatars/';
+            $uploadDir = ROOT . '/../../public/assets/Clients/avatars/';
             $uploadPath = $uploadDir . $avatarFileName;
             
             // 5. TẠO THƯ MỤC NẾU CHƯA TỒN TẠI

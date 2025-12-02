@@ -53,7 +53,7 @@
               <hr class="my-2 border-secondary">
 
               <li class="nav-item">
-                <a class="nav-link" href="#">
+                <a class="nav-link" href="<?php echo WEBROOT; ?>/admin/books">
                   <span class="nav-link-icon d-md-none d-lg-inline-block">
                     <i class="ti ti-book"></i>
                   </span>

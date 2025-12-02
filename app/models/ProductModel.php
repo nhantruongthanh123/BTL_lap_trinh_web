@@ -95,4 +95,108 @@ class ProductModel extends BaseModel {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function addProduct($data){
+        if (empty($data['discount_price']) || $data['discount_price'] <= 0) {
+            $data['discount_price'] = $data['price'];
+        }
+
+        $sql = "INSERT INTO " . $this->table . " 
+                (title, author_id, category_id, price, discount_price, stock_quantity, description, cover_image, isbn, publisher_id, is_active, is_featured, created_at) 
+                VALUES 
+                (:title, :author_id, :category_id, :price, :discount_price, :stock_quantity, :description, :cover_image, :isbn, :publisher_id, :is_active, :is_featured, :created_at)";
+        
+        $stmt = $this->db->prepare($sql);
+
+        $stmt->bindValue(':title', $data['title']);
+        $stmt->bindValue(':author_id', $data['author_id']); 
+        $stmt->bindValue(':category_id', $data['category_id'], PDO::PARAM_INT);          
+        $stmt->bindValue(':price', $data['price']);                      
+        $stmt->bindValue(':discount_price', $data['discount_price']);                   
+        $stmt->bindValue(':stock_quantity', $data['stock_quantity'], PDO::PARAM_INT);   
+        $stmt->bindValue(':description', $data['description']);                         
+        $stmt->bindValue(':cover_image', $data['cover_image']);                          
+        $stmt->bindValue(':isbn', $data['isbn']);
+        $stmt->bindValue(':publisher_id', $data['publisher_id'], PDO::PARAM_INT);
+        $stmt->bindValue(':is_active', $data['is_active'], PDO::PARAM_INT);
+        $stmt->bindValue(':is_featured', $data['is_featured'], PDO::PARAM_INT);
+        $stmt->bindValue(':created_at', $data['created_at']);
+
+        if ($stmt->execute()) {
+            return $this->db->lastInsertId();
+        }
+        
+        return false;
+    }
+
+    public function updateProduct($id, $data) {
+        $sql = "UPDATE " . $this->table . " SET 
+                title = :title, 
+                author_id = :author,
+                category_id = :category, 
+                price = :price, 
+                discount_price = :discount, 
+                stock_quantity = :stock, 
+                description = :desc,
+                isbn = :isbn,
+                updated_at = :updated_at,
+                publisher_id = :publisher_id";
+        
+        if (!empty($data['cover_image'])) {
+            $sql .= ", cover_image = :image";
+        }
+        
+        $sql .= " WHERE book_id = :id";
+                
+        $stmt = $this->db->prepare($sql);
+        
+        $stmt->bindValue(':title', $data['title']);
+        $stmt->bindValue(':author', $data['author_id']); 
+        $stmt->bindValue(':category', $data['category_id']);
+        $stmt->bindValue(':price', $data['price']);
+        $stmt->bindValue(':discount', $data['discount_price'] ?? 0);
+        $stmt->bindValue(':stock', $data['stock_quantity']);
+        $stmt->bindValue(':desc', $data['description']);
+        $stmt->bindValue(':isbn', $data['isbn'] ?? null);
+        $stmt->bindValue(':updated_at', date('Y-m-d H:i:s'));
+        $stmt->bindValue(':id', $id);
+        $stmt->bindValue(':publisher_id', $data['publisher_id']);
+        
+        if (!empty($data['cover_image'])) {
+            $stmt->bindValue(':image', $data['cover_image']);
+        }
+        
+        return $stmt->execute();
+    }
+
+    public function deleteProduct($id) {
+        $sql = "UPDATE " . $this->table . " SET is_active = 0 WHERE book_id = :id";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':id', $id);
+        return $stmt->execute();
+    }
+
+    public function getProductByIdAdmin($id) {
+        $sql = "SELECT * FROM " . $this->table . " WHERE book_id = :id";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+        
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function getAllProductsAdmin() {
+        $sql = "SELECT b.*, c.category_name, COALESCE(SUM(oi.quantity), 0) as total_sold
+                FROM " . $this->table . " b
+                LEFT JOIN categories c ON b.category_id = c.category_id
+                LEFT JOIN order_items oi ON b.book_id = oi.book_id
+                LEFT JOIN orders o ON oi.order_id = o.order_id 
+                GROUP BY b.book_id
+                ORDER BY b.book_id DESC"; 
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
