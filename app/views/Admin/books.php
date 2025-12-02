@@ -84,10 +84,10 @@
                                     Thao tác
                                 </button>
                                 <div class="dropdown-menu dropdown-menu-end">
-                                    <a class="dropdown-item" href="<?php echo WEBROOT; ?>/admin/book_edit/<?php echo $book['book_id']; ?>">
+                                    <a class="dropdown-item" href="<?php echo WEBROOT; ?>/admin/editBook/<?php echo $book['book_id']; ?>">
                                         <i class="ti ti-pencil me-2 text-primary"></i> Chỉnh sửa
                                     </a>
-                                    <a class="dropdown-item text-danger" href="<?php echo WEBROOT; ?>/admin/book_delete/<?php echo $book['book_id']; ?>" onclick="return confirm('Xóa sách này?');">
+                                    <a class="dropdown-item text-danger" href="<?php echo WEBROOT; ?>/admin/deleteBook/<?php echo $book['book_id']; ?>" onclick="return confirm('Xóa sách này?');">
                                         <i class="ti ti-trash me-2"></i> Xóa bỏ
                                     </a>
                                 </div>

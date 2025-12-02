@@ -132,10 +132,8 @@ class User extends BaseController {
         unset($_SESSION['login_error']);
         unset($_SESSION['success_message']);
 
-        // Lấy danh mục để hiển thị menu
         $categories = $this->model('CategoryModel')->getAllCategories();
 
-        // Chuẩn bị dữ liệu truyền vào view
         $data = [
             'title' => 'Đăng nhập - Bookstore',
             'page' => 'auth',
@@ -144,7 +142,6 @@ class User extends BaseController {
             'success' => $successMessage         
         ];
 
-        // Render view
         $this->render('Block/header', $data);
         $this->render('User/login', $data);
         $this->render('Block/footer');

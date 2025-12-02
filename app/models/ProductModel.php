@@ -139,7 +139,9 @@ class ProductModel extends BaseModel {
                 description = :desc,
                 isbn = :isbn,
                 updated_at = :updated_at,
-                publisher_id = :publisher_id";
+                publisher_id = :publisher_id,
+                is_active = :is_active,
+                is_featured = :is_featured";
         
         if (!empty($data['cover_image'])) {
             $sql .= ", cover_image = :image";
@@ -160,6 +162,8 @@ class ProductModel extends BaseModel {
         $stmt->bindValue(':updated_at', date('Y-m-d H:i:s'));
         $stmt->bindValue(':id', $id);
         $stmt->bindValue(':publisher_id', $data['publisher_id']);
+        $stmt->bindValue(':is_active', $data['is_active']);
+        $stmt->bindValue(':is_featured', $data['is_featured']);
         
         if (!empty($data['cover_image'])) {
             $stmt->bindValue(':image', $data['cover_image']);
