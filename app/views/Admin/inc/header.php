@@ -62,11 +62,29 @@
               </li>
 
               <li class="nav-item">
-                <a class="nav-link" href="#">
+                <a class="nav-link" href="<?php echo WEBROOT; ?>/admin/categories">
                   <span class="nav-link-icon d-md-none d-lg-inline-block">
                     <i class="ti ti-category"></i>
                   </span>
-                  <span class="nav-link-title">Danh mục</span>
+                  <span class="nav-link-title"> Danh mục </span>
+                </a>
+              </li>
+
+              <li class="nav-item">
+                <a class="nav-link" href=" <?php echo WEBROOT; ?>/admin/authors">
+                  <span class="nav-link-icon d-md-none d-lg-inline-block">
+                    <i class="ti ti-user-edit"></i>
+                  </span>
+                  <span class="nav-link-title"> Tác giả </span>
+                </a>
+              </li>
+
+              <li class="nav-item">
+                <a class="nav-link" href=" <?php echo WEBROOT; ?>/admin/publishers">
+                  <span class="nav-link-icon d-md-none d-lg-inline-block">
+                    <i class="ti ti-writing"></i>
+                  </span>
+                  <span class="nav-link-title"> Nhà xuất bản </span>
                 </a>
               </li>
 

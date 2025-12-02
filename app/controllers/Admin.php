@@ -496,4 +496,108 @@ class Admin extends BaseController {
             exit();
         }
     }
+
+
+    public function categories(){
+        if (!isset($_SESSION['user_id']) || ($_SESSION['role'] ?? '') !== 'admin') {
+            header('Location: ' . WEBROOT . '/admin/login');
+            exit();
+        }
+
+        $categories = $this->categoryModel->getAllCategories();
+
+        $data = [
+            'title' => 'Quản lý Danh mục',
+            'page'  => 'categories',
+            'categories' => $categories,
+            'success' => $_SESSION['admin_success'] ?? '',
+            'error'   => $_SESSION['admin_error'] ?? ''
+        ];
+        unset($_SESSION['admin_success']);
+        unset($_SESSION['admin_error']);
+
+        $this->render('Admin/inc/header', $data);
+        $this->render('Admin/categories', $data);
+        $this->render('Admin/inc/footer', $data);
+    }
+
+    public function categoryAddProcess() {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: ' . WEBROOT . '/admin/categories');
+            exit();
+        }
+
+        $category_name = trim($_POST['category_name'] ?? '');
+        $slug = trim($_POST['slug'] ?? '');
+        $description = trim($_POST['description'] ?? '');
+        $is_active = isset($_POST['is_active']) ? 1 : 0;
+
+
+        $data = [
+            'category_name' => $category_name,
+            'slug' => $slug,
+            'description' => $description,
+            'is_active' => $is_active
+        ];
+
+        $result = $this->categoryModel->addCategory($data);
+
+        if ($result) {
+            $_SESSION['admin_success'] = 'Thêm danh mục thành công!';
+        } else {
+            $_SESSION['admin_error'] = 'Thêm danh mục thất bại!';
+        }
+
+        header('Location: ' . WEBROOT . '/admin/categories');
+        exit();
+    }
+
+    public function categoryUpdateProcess() {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: ' . WEBROOT . '/admin/categories');
+            exit();
+        }
+
+        $category_id = intval($_POST['category_id'] ?? 0);
+        $category_name = trim($_POST['category_name'] ?? '');
+        $slug = trim($_POST['slug'] ?? '');
+        $description = trim($_POST['description'] ?? '');
+        $is_active = isset($_POST['is_active']) ? 1 : 0;
+
+
+        $data = [
+            'category_name' => $category_name,
+            'slug' => $slug,
+            'description' => $description,
+            'is_active' => $is_active
+        ];
+
+        $result = $this->categoryModel->updateCategory($category_id, $data);
+
+        if ($result) {
+            $_SESSION['admin_success'] = 'Cập nhật danh mục thành công!';
+        } else {
+            $_SESSION['admin_error'] = 'Cập nhật danh mục thất bại!';
+        }
+
+        header('Location: ' . WEBROOT . '/admin/categories');
+        exit();
+    }
+
+    public function categoryDelete($categoryId) {
+        if (!isset($_SESSION['user_id']) || ($_SESSION['role'] ?? '') !== 'admin') {
+            header('Location: ' . WEBROOT . '/admin/login');
+            exit();
+        }
+
+        $deleted = $this->categoryModel->deleteCategory($categoryId);
+
+        if ($deleted) {
+            $_SESSION['admin_success'] = 'Xóa danh mục thành công!';
+        } else {
+            $_SESSION['admin_error'] = 'Xóa danh mục thất bại!';
+        }
+
+        header('Location: ' . WEBROOT . '/admin/categories');
+    }
 }

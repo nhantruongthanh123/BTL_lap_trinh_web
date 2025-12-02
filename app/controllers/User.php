@@ -114,8 +114,6 @@ class User extends BaseController {
         $_SESSION['registerSuccess'] = $userInfo;
 
         $this->registerSuccess();
-        
-        
     }
 
     public function login(){
