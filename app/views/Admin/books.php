@@ -103,12 +103,46 @@
     </div>
     
     <div class="card-footer d-flex align-items-center">
-        <p class="m-0 text-muted">Hiển thị <span><?php echo count($books); ?></span> sách</p>
+        <p class="m-0 text-muted">
+            Hiển thị <span><?php echo count($books); ?></span> / <strong><?php echo $total_books; ?></strong> sách
+        </p>
+        
         <ul class="pagination m-0 ms-auto">
-            <li class="page-item disabled"><a class="page-link" href="#">Trước</a></li>
-            <li class="page-item active"><a class="page-link" href="#">1</a></li>
-            <li class="page-item"><a class="page-link" href="#">2</a></li>
-            <li class="page-item"><a class="page-link" href="#">Sau</a></li>
+            
+            <li class="page-item <?php echo ($current_page <= 1) ? 'disabled' : ''; ?>">
+                <a class="page-link" href="<?php echo WEBROOT; ?>/admin/books?page=<?php echo $current_page - 1; ?>" tabindex="-1">
+                    <i class="ti ti-chevron-left"></i>
+                </a>
+            </li>
+
+            <?php
+                $range = 2; 
+                
+                for ($i = 1; $i <= $total_pages; $i++) {
+                
+                    if ($i == 1 || $i == $total_pages || ($i >= $current_page - $range && $i <= $current_page + $range)) {
+                        ?>
+                        <li class="page-item <?php echo ($i == $current_page) ? 'active' : ''; ?>">
+                            <a class="page-link" href="<?php echo WEBROOT; ?>/admin/books?page=<?php echo $i; ?>">
+                                <?php echo $i; ?>
+                            </a>
+                        </li>
+                        <?php
+                    } 
+                    elseif ($i == $current_page - $range - 1 || $i == $current_page + $range + 1) {
+                        ?>
+                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                        <?php
+                    }
+                }
+            ?>
+
+            <li class="page-item <?php echo ($current_page >= $total_pages) ? 'disabled' : ''; ?>">
+                <a class="page-link" href="<?php echo WEBROOT; ?>/admin/books?page=<?php echo $current_page + 1; ?>">
+                    <i class="ti ti-chevron-right"></i>
+                </a>
+            </li>
+            
         </ul>
     </div>
 </div>

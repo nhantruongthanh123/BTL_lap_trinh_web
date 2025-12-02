@@ -190,7 +190,7 @@ class ProductModel extends BaseModel {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function getAllProductsAdmin() {
+    public function getAllProductsAdmin($limit = null, $offset = null) {
         $sql = "SELECT b.*, c.category_name, COALESCE(SUM(oi.quantity), 0) as total_sold
                 FROM " . $this->table . " b
                 LEFT JOIN categories c ON b.category_id = c.category_id
@@ -198,9 +198,29 @@ class ProductModel extends BaseModel {
                 LEFT JOIN orders o ON oi.order_id = o.order_id 
                 GROUP BY b.book_id
                 ORDER BY b.book_id DESC"; 
+
+        if ($limit !== null && $offset !== null) {
+            $sql .= " LIMIT :limit OFFSET :offset";
+        }
+        
+        $stmt = $this->db->prepare($sql);
+
+        if ($limit !== null && $offset !== null) {
+            $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
+            $stmt->bindValue(':offset', (int)$offset, PDO::PARAM_INT);
+        }
+
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function countAllProducts() {
+        $sql = "SELECT COUNT(*) as total FROM " . $this->table;
         
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result ? (int)$result['total'] : 0;
     }
 }
