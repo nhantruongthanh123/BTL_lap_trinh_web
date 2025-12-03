@@ -146,12 +146,9 @@ CREATE TABLE orders (
     shipping_fee DECIMAL(10, 2) DEFAULT 0,
     final_amount DECIMAL(10, 2) NOT NULL,
     status ENUM('pending', 'confirmed', 'processing', 'shipping', 'delivered', 'cancelled') DEFAULT 'pending',
-    payment_method ENUM('cod', 'bank_transfer', 'credit_card', 'momo', 'zalopay') DEFAULT 'cod',
     payment_status ENUM('unpaid', 'paid', 'refunded') DEFAULT 'unpaid',
-    shipping_name VARCHAR(100) NOT NULL,
-    shipping_phone VARCHAR(20) NOT NULL,
-    shipping_address TEXT NOT NULL,
     note TEXT,
+    shipping_address TEXT NOT NULL,
     order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     confirmed_at TIMESTAMP NULL,
     shipped_at TIMESTAMP NULL,
@@ -173,12 +170,14 @@ CREATE TABLE order_items (
     book_id INT NOT NULL,
     quantity INT NOT NULL,
     price DECIMAL(10, 2) NOT NULL,
-    discount_price DECIMAL(10, 2),
     subtotal DECIMAL(10, 2) NOT NULL,
     FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE,
     FOREIGN KEY (book_id) REFERENCES books(book_id) ON DELETE CASCADE,
     INDEX idx_order (order_id),
     INDEX idx_book (book_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+
 
 

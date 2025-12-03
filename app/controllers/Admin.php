@@ -6,6 +6,7 @@ class Admin extends BaseController {
     public $categoryModel;
     public $publisherModel;
     public $authorModel;
+    public $orderModel;
 
     public function __construct(){
         // if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin'){
@@ -17,6 +18,7 @@ class Admin extends BaseController {
         $this->categoryModel = $this->model('CategoryModel');
         $this->publisherModel = $this->model('PublisherModel');
         $this->authorModel = $this->model('AuthorModel');
+        $this->orderModel = $this->model('OrderModel');
     }
 
     public function index(){
@@ -846,6 +848,133 @@ class Admin extends BaseController {
         }
 
         header('Location: ' . WEBROOT . '/admin/publishers');
+        exit();
+    }
+
+    public function orders(){
+        if (!isset($_SESSION['user_id']) || ($_SESSION['role'] ?? '') !== 'admin') {
+            header('Location: ' . WEBROOT . '/admin/login');
+            exit();
+        }
+
+        $orders = $this->orderModel->getAllOrders();
+
+        $data = [
+            'title' => 'Quản lý Đơn hàng',
+            'page'  => 'orders',
+            'orders' => $orders,
+            'success' => $_SESSION['admin_success'] ?? '',
+            'error'   => $_SESSION['admin_error'] ?? ''
+        ];
+        unset($_SESSION['admin_success']);
+        unset($_SESSION['admin_error']);
+
+        $this->render('Admin/inc/header', $data);
+        $this->render('Admin/orders', $data);
+        $this->render('Admin/inc/footer', $data);
+    }
+
+    public function orderDetail($orderId) {
+        if (!isset($_SESSION['user_id']) || ($_SESSION['role'] ?? '') !== 'admin') {
+            header('Location: ' . WEBROOT . '/admin/login');
+            exit();
+        }
+
+        // LẤY THÔNG TIN ĐƠN HÀNG
+        $order = $this->orderModel->getOrderById($orderId);
+        
+        if (!$order) {
+            $_SESSION['admin_error'] = 'Đơn hàng không tồn tại!';
+            header('Location: ' . WEBROOT . '/admin/orders');
+            exit();
+        }
+
+        // LẤY CHI TIẾT SẢN PHẨM TRONG ĐƠN HÀNG
+        $orderItems = $this->orderModel->getOrderItems($orderId);
+
+        $data = [
+            'title' => 'Chi tiết đơn hàng #' . $order['order_number'],
+            'page'  => 'orders',
+            'order' => $order,
+            'orderItems' => $orderItems,
+            'success' => $_SESSION['admin_success'] ?? '',
+            'error'   => $_SESSION['admin_error'] ?? ''
+        ];
+        
+        unset($_SESSION['admin_success'], $_SESSION['admin_error']);
+
+        $this->render('Admin/inc/header', $data);
+        $this->render('Admin/orderDetail', $data);
+        $this->render('Admin/inc/footer', $data);
+    }
+
+    // CẬP NHẬT TRẠNG THÁI ĐƠN HÀNG
+    public function updateOrderStatus() {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: ' . WEBROOT . '/admin/orders');
+            exit();
+        }
+
+        if (!isset($_SESSION['user_id']) || ($_SESSION['role'] ?? '') !== 'admin') {
+            header('Location: ' . WEBROOT . '/admin/login');
+            exit();
+        }
+
+        $orderId = intval($_POST['order_id'] ?? 0);
+        $status = trim($_POST['status'] ?? '');
+
+        $validStatuses = ['pending', 'confirmed', 'shipping', 'delivered', 'cancelled'];
+        
+        if (!in_array($status, $validStatuses)) {
+            $_SESSION['admin_error'] = 'Trạng thái không hợp lệ!';
+            header('Location: ' . WEBROOT . '/admin/orderDetail/' . $orderId);
+            exit();
+        }
+
+        $result = $this->orderModel->updateOrderStatus($orderId, $status);
+
+        if ($result) {
+            $_SESSION['admin_success'] = 'Cập nhật trạng thái đơn hàng thành công!';
+        } else {
+            $_SESSION['admin_error'] = 'Cập nhật trạng thái thất bại!';
+        }
+
+        header('Location: ' . WEBROOT . '/admin/orderDetail/' . $orderId);
+        exit();
+    }
+
+    // CẬP NHẬT TRẠNG THÁI THANH TOÁN
+    public function updatePaymentStatus() {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: ' . WEBROOT . '/admin/orders');
+            exit();
+        }
+
+        if (!isset($_SESSION['user_id']) || ($_SESSION['role'] ?? '') !== 'admin') {
+            header('Location: ' . WEBROOT . '/admin/login');
+            exit();
+        }
+
+        $orderId = intval($_POST['order_id'] ?? 0);
+        $paymentStatus = trim($_POST['payment_status'] ?? '');
+
+        $validPaymentStatuses = ['unpaid', 'paid', 'refunded'];
+        
+        if (!in_array($paymentStatus, $validPaymentStatuses)) {
+            $_SESSION['admin_error'] = 'Trạng thái thanh toán không hợp lệ!';
+            header('Location: ' . WEBROOT . '/admin/orderDetail/' . $orderId);
+            exit();
+        }
+
+        $result = $this->orderModel->updatePaymentStatus($orderId, $paymentStatus);
+
+        if ($result) {
+            $_SESSION['admin_success'] = 'Cập nhật trạng thái thanh toán thành công!';
+        } else {
+            $_SESSION['admin_error'] = 'Cập nhật trạng thái thanh toán thất bại!';
+        }
+
+        header('Location: ' . WEBROOT . '/admin/orderDetail/' . $orderId);
         exit();
     }
 

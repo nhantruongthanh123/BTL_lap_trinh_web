@@ -89,7 +89,7 @@
               </li>
 
               <li class="nav-item">
-                <a class="nav-link" href="#">
+                <a class="nav-link" href="<?php echo WEBROOT; ?>/admin/orders">
                   <span class="nav-link-icon d-md-none d-lg-inline-block">
                     <i class="ti ti-shopping-cart"></i>
                   </span>

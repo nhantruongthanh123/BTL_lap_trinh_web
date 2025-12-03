@@ -5,8 +5,8 @@ USE bookstore_db;
 
 -- 1. Thêm Users (Admin + Khách hàng test)
 INSERT INTO users (username, email, password_hash, full_name, phone, role, address) VALUES
-('admin', 'admin@bookstore.com', '$2y$10$wSbdhckqQo4.e0Q.h/r.EOe7.v7q.v7q.v7q.v7q.v7q.v7q', 'Quản Trị Viên', '0909000000', 'admin', 'Văn phòng Nhà sách'),
-('khachhang1', 'khach1@gmail.com', '$2y$10$wSbdhckqQo4.e0Q.h/r.EOe7.v7q.v7q.v7q.v7q.v7q.v7q', 'Nguyễn Văn Mua', '0912345678', 'customer', '123 Đường Láng, Hà Nội'),
+('admin', 'admin@bookstore.com', '$2y$10$rl2sRlKeCNuvmVOW8yrxFeoTgxV4/kcBtuQAz813C0oxHtEiMdJES', 'Quản Trị Viên', '0909000000', 'admin', 'Văn phòng Nhà sách'),
+('khachhang1', 'khach1@gmail.com', '$2y$10$qL.0KuJW5titkgaUDySBzOZt5lVQKph3FS0HS/Trw47GuPuC/k7/W', 'Nguyễn Văn Mua', '0912345678', 'customer', '123 Đường Láng, Hà Nội'),
 ('khachhang2', 'khach2@gmail.com', '$2y$10$wSbdhckqQo4.e0Q.h/r.EOe7.v7q.v7q.v7q.v7q.v7q.v7q', 'Trần Thị Bán', '0987654321', 'customer', '456 Lê Lợi, TP.HCM');
 
 -- 2. Thêm Categories (Thể loại)
@@ -62,4 +62,14 @@ INSERT INTO reviews (book_id, user_id, rating, comment, is_approved) VALUES
 (3, 3, 4, 'Sách bổ ích cho sinh viên, nên đọc khi còn trẻ.', 1),
 (4, 2, 5, 'Harry Potter là đỉnh nhất! Con tôi rất thích.', 1),
 (5, 3, 5, 'Nhà Giả Kim thay đổi cách nhìn cuộc sống của tôi.', 1);
+
+
+INSERT INTO orders (user_id, total_amount, shipping_fee, final_amount, status, payment_status, order_number, shipping_address) VALUES
+(2, 145000, 15000, 160000, 'delivered', 'paid', 'ORD-2025-001', '123 Đường Láng, Hà Nội');
+
+INSERT INTO order_items (order_id, book_id, quantity, price, subtotal) VALUES
+(1, 2, 1, 85000, 85000),
+(1, 3, 1, 60000, 60000);
+
+
 
