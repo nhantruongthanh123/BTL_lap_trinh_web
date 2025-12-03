@@ -728,4 +728,127 @@ class Admin extends BaseController {
         header('Location: ' . WEBROOT . '/admin/authors');
         exit();
     }
+
+    public function publishers(){
+        if (!isset($_SESSION['user_id']) || ($_SESSION['role'] ?? '') !== 'admin') {
+            header('Location: ' . WEBROOT . '/admin/login');
+            exit();
+        }
+
+        $publishers = $this->publisherModel->getAllPublishers();
+
+        $data = [
+            'title' => 'Quản lý Nhà xuất bản',
+            'page'  => 'publishers',
+            'publishers' => $publishers,
+            'success' => $_SESSION['admin_success'] ?? '',
+            'error'   => $_SESSION['admin_error'] ?? ''
+        ];
+        unset($_SESSION['admin_success']);
+        unset($_SESSION['admin_error']);
+
+        $this->render('Admin/inc/header', $data);
+        $this->render('Admin/publishers', $data);
+        $this->render('Admin/inc/footer', $data);
+    }
+
+    public function publisherAddProcess() {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: ' . WEBROOT . '/admin/publishers');
+            exit();
+        }
+
+        $publisher_name = trim($_POST['publisher_name'] ?? '');
+        $phone = trim($_POST['phone'] ?? '');
+        $email = trim($_POST['email'] ?? '');
+
+        if (empty($publisher_name)) {
+            $_SESSION['admin_error'] = 'Tên nhà xuất bản không được để trống!';
+            header('Location: ' . WEBROOT . '/admin/publishers');
+            exit();
+        }
+        else if (!empty($phone) && !preg_match('/^0[0-9]{9}$/', $phone)) {
+            $_SESSION['admin_error'] = 'Số điện thoại không hợp lệ (Phải có 10 số và bắt đầu bằng số 0)!';
+            header('Location: ' . WEBROOT . '/admin/publishers');
+            exit();
+        }
+
+        $data = [
+            'publisher_name' => $publisher_name,
+            'phone' => $phone,
+            'email' => $email
+        ];
+
+        $result = $this->publisherModel->addPublisher($data);
+
+        if ($result) {
+            $_SESSION['admin_success'] = 'Thêm nhà xuất bản thành công!';
+        } else {
+            $_SESSION['admin_error'] = 'Thêm nhà xuất bản thất bại!';
+        }
+
+        header('Location: ' . WEBROOT . '/admin/publishers');
+        exit();
+    }
+
+    public function publisherUpdateProcess() {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: ' . WEBROOT . '/admin/publishers');
+            exit();
+        }
+
+        $publisher_id = intval($_POST['publisher_id'] ?? 0);
+        $publisher_name = trim($_POST['publisher_name'] ?? '');
+        $phone = trim($_POST['phone'] ?? '');
+        $email = trim($_POST['email'] ?? '');
+
+        if (empty($publisher_name)) {
+            $_SESSION['admin_error'] = 'Tên nhà xuất bản không được để trống!';
+            header('Location: ' . WEBROOT . '/admin/publishers');
+            exit();
+        }
+        else if (!empty($phone) && !preg_match('/^0[0-9]{9}$/', $phone)) {
+            $_SESSION['admin_error'] = 'Số điện thoại không hợp lệ (Phải có 10 số và bắt đầu bằng số 0)!';
+            header('Location: ' . WEBROOT . '/admin/publishers');
+            exit();
+        }
+
+        $data = [
+            'publisher_name' => $publisher_name,
+            'phone' => $phone,
+            'email' => $email
+        ];
+
+        $result = $this->publisherModel->updatePublisher($publisher_id, $data);
+
+        if ($result) {
+            $_SESSION['admin_success'] = 'Cập nhật nhà xuất bản thành công!';
+        } else {
+            $_SESSION['admin_error'] = 'Cập nhật nhà xuất bản thất bại!';
+        }
+
+        header('Location: ' . WEBROOT . '/admin/publishers');
+        exit();
+    }
+
+    public function publisherDelete($publisherId) {
+        if (!isset($_SESSION['user_id']) || ($_SESSION['role'] ?? '') !== 'admin') {
+            header('Location: ' . WEBROOT . '/admin/login');
+            exit();
+        }
+
+        $result = $this->publisherModel->deletePublisher($publisherId);
+
+        if ($result) {
+            $_SESSION['admin_success'] = 'Xóa nhà xuất bản thành công!';
+        } else {
+            $_SESSION['admin_error'] = 'Không thể xóa! Nhà xuất bản này đang có sách.';
+        }
+
+        header('Location: ' . WEBROOT . '/admin/publishers');
+        exit();
+    }
+
+
+
 }
