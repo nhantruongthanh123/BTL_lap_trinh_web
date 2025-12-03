@@ -54,9 +54,9 @@
                     <tr>
                         <th>Tên danh mục</th>
                         <th style="width: 200px;">Slug (URL)</th>
-                        <th style="width: 100px;" class="text-center">Số sách</th>
+                        <th style="width: 200px;" class="text-center">Số sách</th>
                         <th style="width: 120px;" class="text-center">Trạng thái</th>
-                        <th style="width: 150px;" class="text-center">Thao tác</th>
+                        <th style="width: 200px;" class="text-center">Thao tác</th>
                     </tr>
                 </thead>
                 <tbody>

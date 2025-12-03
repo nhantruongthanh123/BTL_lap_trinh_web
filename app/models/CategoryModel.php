@@ -3,9 +3,16 @@ class CategoryModel extends BaseModel {
     protected $table = 'categories';
 
     public function getAllCategories(){
-        $sql = "SELECT category_id, category_name, slug, is_active, description FROM {$this->table} ORDER BY category_name ASC";
+        $sql = "SELECT c.category_id, c.category_name, c.slug, c.is_active, c.description, 
+                       COUNT(b.book_id) as book_count
+                FROM {$this->table} c
+                LEFT JOIN books b ON c.category_id = b.category_id
+                GROUP BY c.category_id
+                ORDER BY c.category_name ASC";
+        
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
+        
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 

@@ -613,4 +613,119 @@ class Admin extends BaseController {
 
         header('Location: ' . WEBROOT . '/admin/categories');
     }
+
+    public function authors(){
+        if (!isset($_SESSION['user_id']) || ($_SESSION['role'] ?? '') !== 'admin') {
+            header('Location: ' . WEBROOT . '/admin/login');
+            exit();
+        }
+
+        $authors = $this->authorModel->getAllAuthors();
+
+        $data = [
+            'title' => 'Quản lý Tác giả',
+            'page'  => 'authors',
+            'authors' => $authors,
+            'success' => $_SESSION['admin_success'] ?? '',
+            'error'   => $_SESSION['admin_error'] ?? ''
+        ];
+        unset($_SESSION['admin_success']);
+        unset($_SESSION['admin_error']);
+
+        $this->render('Admin/inc/header', $data);
+        $this->render('Admin/authors', $data);
+        $this->render('Admin/inc/footer', $data);
+    }
+
+    public function authorAddProcess() {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: ' . WEBROOT . '/admin/authors');
+            exit();
+        }
+
+        $author_name = trim($_POST['author_name'] ?? '');
+        $nationality = trim($_POST['nationality'] ?? '');
+        $birth_date = trim($_POST['birth_date'] ?? '');
+        $biography = trim($_POST['biography'] ?? '');
+
+        // Validate
+        if (empty($author_name)) {
+            $_SESSION['admin_error'] = 'Tên tác giả không được để trống!';
+            header('Location: ' . WEBROOT . '/admin/authors');
+            exit();
+        }
+
+        $data = [
+            'author_name' => $author_name,
+            'nationality' => $nationality ?: null,
+            'birth_date' => $birth_date ?: null,
+            'biography' => $biography
+        ];
+
+        $result = $this->authorModel->addAuthor($data);
+
+        if ($result) {
+            $_SESSION['admin_success'] = 'Thêm tác giả thành công!';
+        } else {
+            $_SESSION['admin_error'] = 'Thêm tác giả thất bại!';
+        }
+
+        header('Location: ' . WEBROOT . '/admin/authors');
+        exit();
+    }
+
+    public function authorUpdateProcess() {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: ' . WEBROOT . '/admin/authors');
+            exit();
+        }
+
+        $author_id = intval($_POST['author_id'] ?? 0);
+        $author_name = trim($_POST['author_name'] ?? '');
+        $nationality = trim($_POST['nationality'] ?? '');
+        $birth_date = trim($_POST['birth_date'] ?? '');
+        $biography = trim($_POST['biography'] ?? '');
+
+        if (empty($author_name)) {
+            $_SESSION['admin_error'] = 'Tên tác giả không được để trống!';
+            header('Location: ' . WEBROOT . '/admin/authors');
+            exit();
+        }
+
+        $data = [
+            'author_name' => $author_name,
+            'nationality' => $nationality ?: null,
+            'birth_date' => $birth_date ?: null,
+            'biography' => $biography
+        ];
+
+        $result = $this->authorModel->updateAuthor($author_id, $data);
+
+        if ($result) {
+            $_SESSION['admin_success'] = 'Cập nhật tác giả thành công!';
+        } else {
+            $_SESSION['admin_error'] = 'Cập nhật tác giả thất bại!';
+        }
+
+        header('Location: ' . WEBROOT . '/admin/authors');
+        exit();
+    }
+
+    public function authorDelete($authorId) {
+        if (!isset($_SESSION['user_id']) || ($_SESSION['role'] ?? '') !== 'admin') {
+            header('Location: ' . WEBROOT . '/admin/login');
+            exit();
+        }
+
+        $result = $this->authorModel->deleteAuthor($authorId);
+
+        if ($result) {
+            $_SESSION['admin_success'] = 'Xóa tác giả thành công!';
+        } else {
+            $_SESSION['admin_error'] = 'Không thể xóa! Tác giả này đang có sách.';
+        }
+
+        header('Location: ' . WEBROOT . '/admin/authors');
+        exit();
+    }
 }
