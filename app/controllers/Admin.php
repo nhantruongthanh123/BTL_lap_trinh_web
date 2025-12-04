@@ -78,6 +78,7 @@ class Admin extends BaseController {
                 $_SESSION['user_id']   = $user['user_id'];
                 $_SESSION['username']  = $user['username'];
                 $_SESSION['full_name'] = $user['full_name'];
+                $_SESSION['email']     = $user['email'];
                 $_SESSION['role']      = $user['role'];
                 $_SESSION['avatar']    = $user['avatar'];
                 header('Location: ' . WEBROOT . '/admin');
