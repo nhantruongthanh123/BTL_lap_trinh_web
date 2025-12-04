@@ -31,7 +31,7 @@ class UserModel extends BaseModel {
     public function findUserByUsername($username) {
         $sql = "SELECT user_id, username, email, password_hash, role, full_name, avatar
                 FROM " . $this->table . " 
-                WHERE username = :username AND is_active = 1";
+                WHERE username = :username";
                 
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':username', $username);
@@ -41,9 +41,9 @@ class UserModel extends BaseModel {
     }
 
     public function getUserById($user_id) {
-        $sql = "SELECT user_id, username, email, role, full_name, gender, birthday, phone, address, password_hash, avatar
+        $sql = "SELECT user_id, username, email, role, full_name, gender, birthday, phone, address, password_hash, avatar, is_active
                 FROM " . $this->table . " 
-                WHERE user_id = :user_id AND is_active = 1";
+                WHERE user_id = :user_id";
                 
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':user_id', $user_id, PDO::PARAM_INT);
@@ -160,6 +160,38 @@ class UserModel extends BaseModel {
             return 0;
         }
         
+    }
+
+    public function getAllCustomers(){
+        $sql = "SELECT u.*, 
+                       COUNT(o.order_id) as total_orders, 
+                       COALESCE(SUM(o.final_amount), 0) as total_spent
+                FROM " . $this->table . " u
+                
+                -- THÊM ĐIỀU KIỆN TRONG JOIN (Quan trọng)
+                -- Chỉ join những đơn hàng đã thanh toán
+                LEFT JOIN orders o ON u.user_id = o.user_id AND o.payment_status = 'paid'
+                
+                WHERE u.role = 'customer'
+                GROUP BY u.user_id
+                ORDER BY u.user_id DESC";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function updateUserStatus($userId, $isActive) {
+        $sql = "UPDATE users 
+                SET is_active = :is_active,
+                    updated_at = NOW()
+                WHERE user_id = :user_id";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':is_active', $isActive, PDO::PARAM_INT);
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+        
+        return $stmt->execute();
     }
 
 }

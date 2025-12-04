@@ -978,6 +978,85 @@ class Admin extends BaseController {
         exit();
     }
 
+    public function customers(){
+        if (!isset($_SESSION['user_id']) || ($_SESSION['role'] ?? '') !== 'admin') {
+            header('Location: ' . WEBROOT . '/admin/login');
+            exit();
+        }
+
+        $customers = $this->userModel->getAllCustomers();
+
+        $data = [
+            'title' => 'Quản lý Khách hàng',
+            'page'  => 'customers',
+            'customers' => $customers,
+            'success' => $_SESSION['admin_success'] ?? '',
+            'error'   => $_SESSION['admin_error'] ?? ''
+        ];
+        
+        unset($_SESSION['admin_success'], $_SESSION['admin_error']);
+
+        $this->render('Admin/inc/header', $data);
+        $this->render('Admin/customers', $data);
+        $this->render('Admin/inc/footer', $data);
+    }
+
+    // CẬP NHẬT TRẠNG THÁI KHÁCH HÀNG (ACTIVE/INACTIVE)
+    public function toggleCustomerStatus($userId) {
+        if (!isset($_SESSION['user_id']) || ($_SESSION['role'] ?? '') !== 'admin') {
+            header('Location: ' . WEBROOT . '/admin/login');
+            exit();
+        }
+
+        $user = $this->userModel->getUserById($userId);
+        
+        if (!$user) {
+            $_SESSION['admin_error'] = 'Khách hàng không tồn tại!';
+            header('Location: ' . WEBROOT . '/admin/customers');
+            exit();
+        }
+
+        $newStatus = $user['is_active'] ? 0 : 1;
+        $result = $this->userModel->updateUserStatus($userId, $newStatus);
+
+        if (isset($newStatus)) echo 'hihihi';
+
+        if ($result) {
+            $statusText = $newStatus ? 'kích hoạt' : 'vô hiệu hóa';
+            $_SESSION['admin_success'] = "Đã {$statusText} tài khoản thành công!";
+        } else {
+            $_SESSION['admin_error'] = 'Cập nhật trạng thái thất bại!';
+        }
+
+        header('Location: ' . WEBROOT . '/admin/customers');
+        exit();
+    }
+
+    // XÓA KHÁCH HÀNG
+    public function deleteCustomer($userId) {
+        if (!isset($_SESSION['user_id']) || ($_SESSION['role'] ?? '') !== 'admin') {
+            header('Location: ' . WEBROOT . '/admin/login');
+            exit();
+        }
+
+        // Không cho phép xóa chính mình
+        if ($userId == $_SESSION['user_id']) {
+            $_SESSION['admin_error'] = 'Không thể xóa tài khoản của chính bạn!';
+            header('Location: ' . WEBROOT . '/admin/customers');
+            exit();
+        }
+
+        $result = $this->userModel->deleteUser($userId);
+
+        if ($result) {
+            $_SESSION['admin_success'] = 'Xóa khách hàng thành công!';
+        } else {
+            $_SESSION['admin_error'] = 'Không thể xóa! Khách hàng này có đơn hàng.';
+        }
+
+        header('Location: ' . WEBROOT . '/admin/customers');
+        exit();
+    }
 
 
 }
