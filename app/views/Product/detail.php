@@ -103,39 +103,66 @@ $finalPrice = $hasDiscount ? $book['discount_price'] : $book['price'];
 
         <!-- Form mua hàng -->
         <div class="col-md-3">
-            <div class="card shadow-sm sticky-top" style="top: 20px;">
+            <div class="card shadow-sm sticky-top border-0" style="top: 100px; z-index: 100;">
                 <div class="card-body">
-                    <h5 class="card-title mb-3">Thêm vào giỏ hàng</h5>
+                    <h5 class="card-title mb-3 fw-bold">Mua hàng</h5>
                     
                     <form action="<?php echo WEBROOT; ?>/cart/add" method="POST">
-                        <input type="hidden" name="book_id" value="<?php echo $book['book_id']; ?>">
+                        <input type="hidden" name="product_id" value="<?php echo (int)$book['book_id']; ?>">
                         
                         <div class="mb-3">
-                            <label class="form-label">Số lượng</label>
+                            <label class="form-label text-muted small">Số lượng:</label>
                             <div class="input-group">
-                                <button class="btn btn-outline-secondary" type="button" onclick="decreaseQty()">-</button>
-                                <input type="number" class="form-control text-center" name="quantity" 
-                                       id="quantity" value="1" min="1" max="<?php echo $book['stock_quantity']; ?>">
-                                <button class="btn btn-outline-secondary" type="button" onclick="increaseQty()">+</button>
+                                <button class="btn btn-outline-secondary" type="button" onclick="this.parentNode.querySelector('input[type=number]').stepDown()">
+                                    <i class="fas fa-minus small"></i>
+                                </button>
+                                
+                                <input type="number" class="form-control text-center fw-bold" name="quantity" 
+                                    id="quantityInput" value="1" min="1" max="<?php echo $book['stock_quantity']; ?>">
+                                    
+                                <button class="btn btn-outline-secondary" type="button" onclick="this.parentNode.querySelector('input[type=number]').stepUp()">
+                                    <i class="fas fa-plus small"></i>
+                                </button>
+                            </div>
+                            <div class="form-text small mt-1 text-muted">
+                                Kho: <?php echo $book['stock_quantity']; ?> sản phẩm
                             </div>
                         </div>
 
                         <?php if ($book['stock_quantity'] > 0): ?>
-                            <button type="submit" class="btn btn-primary w-100 mb-2">
+                            <button type="submit" class="btn btn-outline-primary w-100 mb-2 py-2">
                                 <i class="fas fa-cart-plus me-2"></i>Thêm vào giỏ
                             </button>
-                            <button type="button" class="btn btn-danger w-100">
-                                <i class="fas fa-shopping-bag me-2"></i>Mua ngay
+                            
+                            <button type="submit" name="action" value="buy_now" class="btn btn-danger w-100 py-2 fw-bold">
+                                Mua ngay
                             </button>
                         <?php else: ?>
-                            <button type="button" class="btn btn-secondary w-100" disabled>
-                                Hết hàng
+                            <button type="button" class="btn btn-secondary w-100 py-2" disabled>
+                                <i class="fas fa-ban me-2"></i>Hết hàng
                             </button>
+                            <small class="text-danger d-block text-center mt-2">Vui lòng quay lại sau</small>
                         <?php endif; ?>
                     </form>
+                    
+                    <hr class="my-3">
+                    
+                    <div class="small text-muted">
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="fas fa-truck me-2 text-success"></i> Giao hàng toàn quốc
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="fas fa-shield-alt me-2 text-success"></i> Bảo hành đổi trả
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-check-circle me-2 text-success"></i> Sách chính hãng 100%
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
+
     </div>
 
     <!-- Sách liên quan -->

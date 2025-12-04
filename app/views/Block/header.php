@@ -13,7 +13,7 @@
 </head>
 <body class="d-flex flex-column min-vh-100">
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow">
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow ">
   <div class="container">
     <a class="navbar-brand fw-bold" href="<?php echo WEBROOT; ?>">
         <i class="fas fa-book-reader me-2"></i>BOOKSTORE
@@ -86,15 +86,24 @@
             </div>
         </form>
 
-        <a href="<?php echo WEBROOT; ?>/cart" class="btn btn-outline-light position-relative border-0">
+        <?php 
+            $totalQty = 0;
+            if (isset($_SESSION['cart']) && !empty($_SESSION['cart'])) {
+                foreach ($_SESSION['cart'] as $qty) {
+                    $totalQty += $qty;
+                }
+            }
+        ?>
+
+        <a href="<?php echo WEBROOT; ?>/cart" class="btn btn-outline-light position-relative border-0 me-2">
             <i class="fas fa-shopping-cart fa-lg"></i>
             <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                0
+                <?php echo $totalQty; ?>
             </span>
         </a>
         
         <?php if (isset($_SESSION['user_id'])): ?>
-            <div class="dropdown">
+            <div class="dropdown" style="z-index: 1000;">
                 <button class="btn btn-light dropdown-toggle d-flex align-items-center gap-2" 
                         type="button" 
                         id="userDropdown" 
