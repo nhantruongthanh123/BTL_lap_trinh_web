@@ -171,11 +171,24 @@
                             <i class="fas fa-user me-2"></i>Thông tin tài khoản
                         </a>
                     </li>
-                    <li>
-                        <a class="dropdown-item" href="<?php echo WEBROOT; ?>/user/orders">
-                            <i class="fas fa-shopping-bag me-2"></i>Đơn hàng của tôi
-                        </a>
-                    </li>
+                    
+                    <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'customer'): ?>
+                        <li>
+                            <a class="dropdown-item" href="<?php echo WEBROOT; ?>/user/orders">
+                                <i class="fas fa-shopping-bag me-2"></i>Đơn hàng của tôi
+                                <?php if (isset($_SESSION['pending_orders']) && $_SESSION['pending_orders'] > 0): ?>
+                                    <span class="badge bg-warning text-dark ms-1"><?php echo $_SESSION['pending_orders']; ?></span>
+                                <?php endif; ?>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="<?php echo WEBROOT; ?>/user/orderHistory">
+                                <i class="fas fa-history me-2"></i>Lịch sử mua hàng
+                            </a>
+                        </li>
+                        <li>
+                    <?php endif; ?>
+
                     <li>
                         <a class="dropdown-item" href="<?php echo WEBROOT; ?>/user/changePassword">
                             <i class="fas fa-key me-2"></i>Đổi mật khẩu

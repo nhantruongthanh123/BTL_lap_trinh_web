@@ -2,10 +2,12 @@
 class User extends BaseController {
     private $userModel;
     private $categoryModel;
+    private $orderModel;
 
     public function __construct() {
         $this->userModel = $this->model('UserModel');
         $this->categoryModel = $this->model('CategoryModel');
+        $this->orderModel = $this->model('OrderModel');
     }
 
     public function register(){
@@ -590,4 +592,58 @@ class User extends BaseController {
         
         exit();
     }
+
+    public function orders() {
+        if (!isset($_SESSION['user_id'])) {
+            header('Location: ' . WEBROOT . '/user/login');
+            exit();
+        }
+
+        $userId = $_SESSION['user_id'];
+        $status = $_GET['status'] ?? 'all';
+
+        // Chỉ lấy đơn hàng CHƯA HOÀN THÀNH (chưa delivered và chưa cancelled)
+        if ($status === 'all') {
+            $orders = $this->orderModel->getActiveOrdersByUserId($userId);
+        } else {
+            $orders = $this->orderModel->getOrdersByUserIdAndStatus($userId, $status);
+        }
+
+        // Cập nhật số lượng đơn hàng pending vào session
+        $_SESSION['pending_orders'] = $this->orderModel->countUserOrdersByStatus($userId, 'pending');
+
+        $data = [
+            'title' => 'Đơn hàng của tôi',
+            'page' => 'orders',
+            'orders' => $orders,
+            'current_status' => $status
+        ];
+
+        $this->render('Block/header', $data);
+        $this->render('User/orders', $data);
+        $this->render('Block/footer');
+    }
+
+    public function orderHistory() {
+        if (!isset($_SESSION['user_id'])) {
+            header('Location: ' . WEBROOT . '/user/login');
+            exit();
+        }
+
+        $userId = $_SESSION['user_id'];
+
+        $orders = $this->orderModel->getAllOrdersByUserId($userId);
+
+        $data = [
+            'title' => 'Lịch sử mua hàng',
+            'page' => 'orderHistory',
+            'orders' => $orders
+        ];
+
+        $this->render('Block/header', $data);
+        $this->render('User/orderHistory', $data);
+        $this->render('Block/footer');
+    }
+
+
 }

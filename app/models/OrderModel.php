@@ -129,4 +129,56 @@ class OrderModel extends BaseModel {
         
         return $stmt->execute();
     }
+
+    public function getActiveOrdersByUserId($userId) {
+        $sql = "SELECT * FROM orders 
+                WHERE user_id = :user_id 
+                AND status NOT IN ('delivered', 'cancelled')
+                ORDER BY order_date DESC";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->execute();
+        
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getAllOrdersByUserId($userId) {
+        $sql = "SELECT * FROM orders 
+                WHERE user_id = :user_id 
+                ORDER BY order_date DESC";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->execute();
+        
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getOrdersByUserIdAndStatus($userId, $status) {
+        $sql = "SELECT * FROM orders 
+                WHERE user_id = :user_id AND status = :status 
+                ORDER BY order_date DESC";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->bindValue(':status', $status, PDO::PARAM_STR);
+        $stmt->execute();
+        
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function countUserOrdersByStatus($userId, $status) {
+        $sql = "SELECT COUNT(*) as count 
+                FROM orders 
+                WHERE user_id = :user_id AND status = :status";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->bindValue(':status', $status, PDO::PARAM_STR);
+        $stmt->execute();
+        
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result['count'] ?? 0;
+    }
 }
