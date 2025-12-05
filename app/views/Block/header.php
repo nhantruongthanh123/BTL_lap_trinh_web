@@ -62,10 +62,10 @@
 
 
         <li class="nav-item">
-            <a class="nav-link <?php echo (isset($page) && $page === 'about') ? 'active' : ''; ?>" href="#">Giới thiệu</a>
+            <a class="nav-link <?php echo (isset($page) && $page === 'about') ? 'active' : ''; ?>" href="<?php echo WEBROOT; ?>/user/about">Giới thiệu</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link <?php echo (isset($page) && $page === 'contact') ? 'active' : ''; ?>" href="#">Liên hệ</a>
+            <a class="nav-link <?php echo (isset($page) && $page === 'contact') ? 'active' : ''; ?>" href="<?php echo WEBROOT; ?>/user/contact">Liên hệ</a>
         </li>
       </ul>
       

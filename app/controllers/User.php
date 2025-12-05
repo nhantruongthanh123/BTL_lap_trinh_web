@@ -707,4 +707,26 @@ class User extends BaseController {
         header('Location: ' . WEBROOT . '/user/orders');
         exit();
     }
+
+    public function about() {
+        $data = [
+            'title' => 'Giới thiệu về Bookstore',
+            'page' => 'about'
+        ];
+
+        $this->render('Block/header', $data);
+        $this->render('About/index', $data);
+        $this->render('Block/footer');
+    }
+
+    public function contact() {
+        $data = [
+            'title' => 'Liên hệ với Bookstore',
+            'page' => 'contact'
+        ];
+
+        $this->render('Block/header', $data);
+        $this->render('Contact/index', $data);
+        $this->render('Block/footer');
+    }
 }
