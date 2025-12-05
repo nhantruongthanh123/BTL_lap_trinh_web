@@ -18,3 +18,23 @@ Creating order...
 Order items added
 Transaction committed
 SUCCESS! Redirecting to success page...
+OK: User ID = 2
+OK: Cart has items
+OK: Shipping address = 123 Đường Láng, Hà Nội
+OK: Total amount = 50000
+Final amount = 65000
+Order number = ORD-20251205-915C31
+Creating order...
+Order items added
+Transaction committed
+SUCCESS! Redirecting to success page...
+OK: User ID = 2
+OK: Cart has items
+OK: Shipping address = 123 Đường Láng, Hà Nội
+OK: Total amount = 60000
+Final amount = 75000
+Order number = ORD-20251205-A71FD2
+Creating order...
+Order items added
+Transaction committed
+SUCCESS! Redirecting to success page...

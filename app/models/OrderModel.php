@@ -181,4 +181,32 @@ class OrderModel extends BaseModel {
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         return $result['count'] ?? 0;
     }
+
+    public function cancelOrder($orderId) {
+        $sql = "UPDATE orders 
+                SET status = 'cancelled', 
+                    cancelled_at = NOW(),
+                    updated_at = NOW()
+                WHERE order_id = :order_id";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':order_id', $orderId, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $orderItems = $this->getOrderItems($orderId);
+
+        $sqlUpdate = "UPDATE books 
+                      SET stock_quantity = stock_quantity + :quantity 
+                      WHERE book_id = :book_id";
+        
+        $stmtUpdate = $this->db->prepare($sqlUpdate);
+
+        foreach ($orderItems as $item) {
+            $stmtUpdate->bindValue(':book_id', $item['book_id'], PDO::PARAM_INT);
+            $stmtUpdate->bindValue(':quantity', $item['quantity'], PDO::PARAM_INT);
+            $stmtUpdate->execute();
+        }
+
+        return true;
+    }
 }

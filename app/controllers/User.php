@@ -645,5 +645,66 @@ class User extends BaseController {
         $this->render('Block/footer');
     }
 
+    public function orderDetail($orderId) {
+        if (!isset($_SESSION['user_id'])) {
+            header('Location: ' . WEBROOT . '/user/login');
+            exit();
+        }
 
+        $userId = $_SESSION['user_id'];
+
+        $order = $this->orderModel->getOrderById($orderId);
+
+        if (!$order) {
+            header('Location: ' . WEBROOT . '/user/orders');
+            exit();
+        }
+
+        $orderItems = $this->orderModel->getOrderItems($orderId);
+
+        $data = [
+            'title' => 'Chi tiết đơn hàng',
+            'page' => 'orderDetails',
+            'order' => $order,
+            'order_items' => $orderItems
+        ];
+
+        $this->render('Block/header', $data);
+        $this->render('User/orderDetail', $data);
+        $this->render('Block/footer');
+    }
+
+    public function cancelOrder($orderId) {
+        if (!isset($_SESSION['user_id'])) {
+            $_SESSION['error'] = 'Vui lòng đăng nhập';
+            header('Location: ' . WEBROOT . '/user/login');
+            exit();
+        }
+
+        $userId = $_SESSION['user_id'];
+        $order = $this->orderModel->getOrderById($orderId);
+
+        if (!$order || $order['user_id'] != $userId) {
+            $_SESSION['error'] = 'Đơn hàng không tồn tại hoặc bạn không có quyền hủy';
+            header('Location: ' . WEBROOT . '/user/orders');
+            exit();
+        }
+
+        if ($order['status'] !== 'pending') {
+            $_SESSION['error'] = 'Không thể hủy đơn hàng đã được xử lý';
+            header('Location: ' . WEBROOT . '/user/orders');
+            exit();
+        }
+
+        $result = $this->orderModel->cancelOrder($orderId);
+
+        if ($result) {
+            $_SESSION['success'] = 'Hủy đơn hàng thành công. Số lượng sản phẩm đã được hoàn lại vào kho.';
+        } else {
+            $_SESSION['error'] = 'Hủy đơn hàng thất bại. Vui lòng thử lại.';
+        }
+
+        header('Location: ' . WEBROOT . '/user/orders');
+        exit();
+    }
 }

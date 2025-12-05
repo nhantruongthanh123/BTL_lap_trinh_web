@@ -33,7 +33,7 @@
                         <i class="fas fa-arrow-left me-2"></i>Tiếp tục mua sắm
                     </a>
                     
-                    <a href="<?php echo WEBROOT; ?>/order/history" class="btn btn-primary px-4 py-2">
+                    <a href="<?php echo WEBROOT; ?>/user/orderDetail/<?php echo $order['order_id']; ?>" class="btn btn-primary px-4 py-2">
                         Xem đơn hàng <i class="fas fa-file-invoice ms-2"></i>
                     </a>
                 </div>
