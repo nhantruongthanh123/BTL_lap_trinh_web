@@ -138,7 +138,7 @@
                         <div class="d-grid gap-2">
                             <?php if (isset($_SESSION['user_id'])): ?>
                                 <a href="<?php echo WEBROOT; ?>/order/checkout" class="btn btn-primary btn-lg fw-bold py-3 shadow-sm">
-                                    TIẾN HÀNH THANH TOÁN <i class="fas fa-arrow-right ms-2"></i>
+                                    XÁC NHẬN ĐẶT HÀNG <i class="fas fa-arrow-right ms-2"></i>
                                 </a>
                             <?php else: ?>
                                 <a href="<?php echo WEBROOT; ?>/user/login" class="btn btn-warning btn-lg fw-bold py-3 shadow-sm text-white">

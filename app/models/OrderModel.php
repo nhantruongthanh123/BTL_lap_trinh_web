@@ -87,4 +87,46 @@ class OrderModel extends BaseModel {
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         return $result['count'] ?? 0;
     }
+
+    public function createOrder($data) {
+        $sql = "INSERT INTO orders 
+                (user_id, order_number, total_amount, discount_amount, shipping_fee, 
+                final_amount, status, payment_status, payment_method, shipping_address, 
+                note, coupon_code) 
+                VALUES 
+                (:user_id, :order_number, :total_amount, :discount_amount, :shipping_fee, 
+                :final_amount, :status, :payment_status, :payment_method, :shipping_address, 
+                :note, :coupon_code)";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':user_id', $data['user_id'], PDO::PARAM_INT);
+        $stmt->bindValue(':order_number', $data['order_number'], PDO::PARAM_STR);
+        $stmt->bindValue(':total_amount', $data['total_amount'], PDO::PARAM_STR);
+        $stmt->bindValue(':discount_amount', $data['discount_amount'], PDO::PARAM_STR);
+        $stmt->bindValue(':shipping_fee', $data['shipping_fee'], PDO::PARAM_STR);
+        $stmt->bindValue(':final_amount', $data['final_amount'], PDO::PARAM_STR);
+        $stmt->bindValue(':status', $data['status'], PDO::PARAM_STR);
+        $stmt->bindValue(':payment_status', $data['payment_status'], PDO::PARAM_STR);
+        $stmt->bindValue(':payment_method', $data['payment_method'], PDO::PARAM_STR);
+        $stmt->bindValue(':shipping_address', $data['shipping_address'], PDO::PARAM_STR);
+        $stmt->bindValue(':note', $data['note'], PDO::PARAM_STR);
+        $stmt->bindValue(':coupon_code', $data['coupon_code'], PDO::PARAM_STR);
+        
+        $stmt->execute();
+        return $this->db->lastInsertId();
+    }
+
+    public function addOrderItem($data) {
+        $sql = "INSERT INTO order_items (order_id, book_id, quantity, price, subtotal) 
+                VALUES (:order_id, :book_id, :quantity, :price, :subtotal)";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':order_id', $data['order_id'], PDO::PARAM_INT);
+        $stmt->bindValue(':book_id', $data['book_id'], PDO::PARAM_INT);
+        $stmt->bindValue(':quantity', $data['quantity'], PDO::PARAM_INT);
+        $stmt->bindValue(':price', $data['price'], PDO::PARAM_STR);
+        $stmt->bindValue(':subtotal', $data['subtotal'], PDO::PARAM_STR);
+        
+        return $stmt->execute();
+    }
 }

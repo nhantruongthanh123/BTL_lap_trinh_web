@@ -223,4 +223,16 @@ class ProductModel extends BaseModel {
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         return $result ? (int)$result['total'] : 0;
     }
+
+    public function decreaseStock($bookId, $quantity) {
+        $sql = "UPDATE books 
+                SET stock_quantity = stock_quantity - :quantity 
+                WHERE book_id = :book_id";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':book_id', $bookId, PDO::PARAM_INT);
+        $stmt->bindValue(':quantity', $quantity, PDO::PARAM_INT);
+        
+        return $stmt->execute();
+    }
 }

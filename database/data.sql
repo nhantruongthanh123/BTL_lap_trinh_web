@@ -64,12 +64,14 @@ INSERT INTO reviews (book_id, user_id, rating, comment, is_approved) VALUES
 (5, 3, 5, 'Nhà Giả Kim thay đổi cách nhìn cuộc sống của tôi.', 1);
 
 
-INSERT INTO orders (user_id, total_amount, shipping_fee, final_amount, status, payment_status, order_number, shipping_address) VALUES
-(2, 145000, 15000, 160000, 'delivered', 'paid', 'ORD-2025-001', '123 Đường Láng, Hà Nội');
+INSERT INTO orders (user_id, total_amount, shipping_fee, discount_amount, final_amount, status, payment_status, order_number, shipping_address, coupon_code) VALUES
+(2, 145000, 15000, 15000, 145000, 'delivered', 'paid', 'ORD-2025-001', '123 Đường Láng, Hà Nội', 'FREESHIP2025');
 
 INSERT INTO order_items (order_id, book_id, quantity, price, subtotal) VALUES
 (1, 2, 1, 85000, 85000),
 (1, 3, 1, 60000, 60000);
 
 
-
+INSERT INTO coupons (code, discount_type, min_order_value, discount_value, expiration_date, is_active) VALUES
+('FREESHIP2025', 'free_shipping', 100000, 15000, '2025-12-31', 1),
+('SAVE20', 'fixed_amount', 200000, 20000, '2025-12-31', 1);

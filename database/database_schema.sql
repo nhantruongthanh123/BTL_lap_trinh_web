@@ -122,31 +122,19 @@ CREATE TABLE reviews (
     INDEX idx_rating (rating)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Cart items table
-CREATE TABLE cart_items (
-    cart_id INT PRIMARY KEY AUTO_INCREMENT,
-    user_id INT NOT NULL,
-    book_id INT NOT NULL,
-    quantity INT NOT NULL DEFAULT 1,
-    added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-    FOREIGN KEY (book_id) REFERENCES books(book_id) ON DELETE CASCADE,
-    UNIQUE KEY unique_user_book (user_id, book_id),
-    INDEX idx_user (user_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 -- Orders table
 CREATE TABLE orders (
     order_id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT NOT NULL,
+    coupon_code VARCHAR(50) DEFAULT NULL,
     order_number VARCHAR(50) UNIQUE NOT NULL,
     total_amount DECIMAL(10, 2) NOT NULL,
     discount_amount DECIMAL(10, 2) DEFAULT 0,
-    shipping_fee DECIMAL(10, 2) DEFAULT 0,
+    shipping_fee DECIMAL(10, 2) DEFAULT 15000,
     final_amount DECIMAL(10, 2) NOT NULL,
     status ENUM('pending', 'confirmed', 'processing', 'shipping', 'delivered', 'cancelled') DEFAULT 'pending',
     payment_status ENUM('unpaid', 'paid', 'refunded') DEFAULT 'unpaid',
+    payment_method ENUM('cod', 'bank_transfer', 'momo') DEFAULT 'cod',
     note TEXT,
     shipping_address TEXT NOT NULL,
     order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -176,6 +164,20 @@ CREATE TABLE order_items (
     INDEX idx_order (order_id),
     INDEX idx_book (book_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- Counpons table
+CREATE TABLE coupons (
+    coupon_id INT PRIMARY KEY AUTO_INCREMENT,
+    code VARCHAR(50) UNIQUE NOT NULL,
+    discount_type ENUM('free_shipping', 'fixed_amount') NOT NULL,
+    discount_value DECIMAL(10, 2) NOT NULL,
+    min_order_value DECIMAL(10, 2) DEFAULT 0,
+    expiration_date DATE NOT NULL,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 
 
 
