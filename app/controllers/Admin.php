@@ -94,25 +94,26 @@ class Admin extends BaseController {
     }
 
     public function books() {
+        $currentPage = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+        $perPage = 6;
+        $offset = ($currentPage - 1) * $perPage;
+
         $books = $this->productModel->getAllProductsAdmin(); 
-
-        $limit = 5; 
-        $page  = isset($_GET['page']) ? (int)$_GET['page'] : 1; 
-        if ($page < 1) $page = 1;
-
-        $offset = ($page - 1) * $limit;
-
+        $paginatedBooks = $this->productModel->getAllProductsAdmin($perPage, $offset);
         $totalBooks = $this->productModel->countAllProducts();
-        $totalPages = ceil($totalBooks / $limit); // Làm tròn lên (VD: 11 sách / 5 = 2.2 -> 3 trang)
+        $totalPages = ceil($totalBooks / $perPage); 
 
-        $books = $this->productModel->getAllProductsAdmin($limit, $offset);
+        $categories = $this->categoryModel->getAllCategories();
+
         $data = [
             'title' => 'Quản lý Sách',
             'page'  => 'books',
             'books' => $books,
-            'current_page'=> $page,       
-            'total_pages' => $totalPages, 
-            'total_books' => $totalBooks,
+            'paginatedBooks' => $paginatedBooks,
+            'categories' => $categories,
+            'currentPage'=> $currentPage,       
+            'totalPages' => $totalPages, 
+            'totalBooks' => $totalBooks,
             'success' => $_SESSION['admin_success'] ?? '',
             'error'   => $_SESSION['admin_error'] ?? ''
         ];

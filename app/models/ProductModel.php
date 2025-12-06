@@ -228,13 +228,19 @@ class ProductModel extends BaseModel {
     }
 
     public function getAllProductsAdmin($limit = null, $offset = null) {
-        $sql = "SELECT b.*, c.category_name, COALESCE(SUM(oi.quantity), 0) as total_sold
-                FROM " . $this->table . " b
-                LEFT JOIN categories c ON b.category_id = c.category_id
-                LEFT JOIN order_items oi ON b.book_id = oi.book_id
-                LEFT JOIN orders o ON oi.order_id = o.order_id 
-                GROUP BY b.book_id
-                ORDER BY b.book_id DESC"; 
+        $sql = "SELECT b.*, 
+                   c.category_name, 
+                   a.author_name,
+                   p.publisher_name,
+                   COALESCE(SUM(oi.quantity), 0) as total_sold
+            FROM " . $this->table . " b
+            LEFT JOIN categories c ON b.category_id = c.category_id
+            LEFT JOIN authors a ON b.author_id = a.author_id
+            LEFT JOIN publishers p ON b.publisher_id = p.publisher_id
+            LEFT JOIN order_items oi ON b.book_id = oi.book_id
+            LEFT JOIN orders o ON oi.order_id = o.order_id 
+            GROUP BY b.book_id
+            ORDER BY b.book_id DESC"; 
 
         if ($limit !== null && $offset !== null) {
             $sql .= " LIMIT :limit OFFSET :offset";
