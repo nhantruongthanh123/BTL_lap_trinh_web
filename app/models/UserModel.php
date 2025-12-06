@@ -146,20 +146,14 @@ class UserModel extends BaseModel {
     }
     
     public function sumRevenue() {
-        try {
-            $sql = "SELECT SUM(final_amount) as total_revenue 
-                    FROM " . $this->table . " 
-                    WHERE payment_status = 'paid'";
-                    
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute();
-            $result = $stmt->fetch(PDO::FETCH_ASSOC);
-            return $result['total_revenue'];
-        }
-        catch (PDOException $e) {
-            return 0;
-        }
-        
+        $sql = "SELECT SUM(final_amount) as total_revenue 
+                FROM orders 
+                WHERE payment_status = 'paid' AND status IN ('confirmed', 'shipping', 'delivered')";
+                
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result['total_revenue'] ?? 0;
     }
 
     public function getAllCustomers(){

@@ -22,13 +22,28 @@ class Admin extends BaseController {
     }
 
     public function index(){
+        $totalCustomers = $this->userModel->countCustomers();
+        $totalOrders = $this->orderModel->countAllOrders();
+        $totalBooks = $this->productModel->countAllProducts();
+        $sumRevenue = $this->userModel->sumRevenue();
+
+        $weeklyRevenue = $this->orderModel->getWeeklyRevenue();
+
+        $recentOrders = $this->orderModel->getAllOrdersPaginated(5, 0);
+
+        $orderStats = $this->orderModel->getOrderStatistics();
+
+
         $data = [
             'title' => 'Dashboard - Quản trị viên',
             'page'  => 'dashboard',
-            'totalCustomers' => $this->userModel->countCustomers(),
-            'totalOrders'    => $this->userModel->countOrders(),
-            'totalBooks'  => $this->userModel->countBooks(),
-            'sumRevenue'    => $this->userModel->sumRevenue()
+            'totalCustomers' => $totalCustomers,
+            'totalOrders'    => $totalOrders,
+            'totalBooks'     => $totalBooks,
+            'sumRevenue'     => $sumRevenue,
+            'weeklyRevenue'  => $weeklyRevenue,
+            'recentOrders'   => $recentOrders,
+            'orderStats'     => $orderStats
         ];
 
         $this->render('Admin/inc/header', $data);

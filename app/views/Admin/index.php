@@ -5,7 +5,14 @@
     <div class="row g-2 align-items-center">
       <div class="col">
         <div class="page-pretitle">Tổng quan</div>
-        <h2 class="page-title">Ecommerce Dashboard</h2>
+        <h2 class="page-title">Dashboard Quản Trị</h2>
+      </div>
+      <div class="col-auto ms-auto">
+        <div class="btn-list">
+          <a href="<?php echo WEBROOT; ?>/admin/orders" class="btn btn-primary">
+            <i class="ti ti-shopping-cart me-2"></i>Xem đơn hàng
+          </a>
+        </div>
       </div>
     </div>
   </div>
@@ -14,6 +21,7 @@
 <div class="page-body">
   <div class="container-xl">
     
+    <!-- Thống kê tổng quan -->
     <div class="row row-deck row-cards mb-4">
       
       <div class="col-sm-6 col-lg-3">
@@ -27,11 +35,8 @@
               </div>
               <div class="col">
                 <div class="font-weight-medium">Khách hàng</div>
-                <div class="text-muted"> <?php echo $totalCustomers; ?> </div>
+                <div class="text-secondary h2 mb-0"><?php echo number_format($totalCustomers); ?></div>
               </div>
-              <!-- <div class="col-auto align-self-center">
-                 <div class="badge bg-green-lt text-green">+11% <i class="ti ti-arrow-up"></i></div>
-              </div> -->
             </div>
           </div>
         </div>
@@ -48,11 +53,8 @@
               </div>
               <div class="col">
                 <div class="font-weight-medium">Đơn hàng</div>
-                <div class="text-muted"> <?php echo $totalOrders; ?> </div>
+                <div class="text-secondary h2 mb-0"><?php echo number_format($totalOrders); ?></div>
               </div>
-              <!-- <div class="col-auto align-self-center">
-                 <div class="badge bg-red-lt text-red">-9% <i class="ti ti-arrow-down"></i></div>
-              </div> -->
             </div>
           </div>
         </div>
@@ -64,12 +66,12 @@
             <div class="row align-items-center">
               <div class="col-auto">
                 <span class="bg-yellow text-white avatar">
-                  <i class="ti ti-box fs-2"></i>
+                  <i class="ti ti-book fs-2"></i>
                 </span>
               </div>
               <div class="col">
                 <div class="font-weight-medium">Sản phẩm</div>
-                <div class="text-muted"> <?php echo $totalBooks; ?> </div>
+                <div class="text-secondary h2 mb-0"><?php echo number_format($totalBooks); ?></div>
               </div>
             </div>
           </div>
@@ -87,7 +89,7 @@
               </div>
               <div class="col">
                 <div class="font-weight-medium">Doanh thu</div>
-                <div class="text-muted"><?php echo number_format($sumRevenue, 0, ',', '.'); ?> VND</div>
+                <div class="text-secondary h3 mb-0"><?php echo number_format($sumRevenue, 0, ',', '.'); ?>đ</div>
               </div>
             </div>
           </div>
@@ -98,47 +100,104 @@
 
     <div class="row row-deck row-cards">
       
+      <!-- Biểu đồ doanh thu 7 ngày -->
       <div class="col-lg-8">
         <div class="card">
           <div class="card-header border-0">
-            <div class="card-title">Doanh số hàng tháng</div>
+            <h3 class="card-title">Doanh thu 7 ngày gần nhất</h3>
           </div>
           <div class="card-body">
-            <div id="chart-sales" style="min-height: 300px;"></div>
+            <div id="chart-revenue" style="min-height: 300px;"></div>
           </div>
         </div>
       </div>
 
+      <!-- Thống kê trạng thái đơn hàng -->
       <div class="col-lg-4">
         <div class="card">
           <div class="card-header border-0">
-            <div class="card-title">Mục tiêu tháng</div>
+            <h3 class="card-title">Trạng thái đơn hàng</h3>
           </div>
-          <div class="card-body d-flex flex-column justify-content-center align-items-center">
-            <div id="chart-target" style="min-height: 250px;"></div>
-            <div class="text-center mt-3">
-                <p class="text-muted mb-1">Doanh thu thực tế</p>
-                <h2 class="text-primary fw-bold">$3,287</h2>
-                <small class="text-success">Rất tốt, tiếp tục phát huy!</small>
-            </div>
+          <div class="card-body">
+            <div id="chart-order-status" style="min-height: 300px;"></div>
           </div>
         </div>
       </div>
 
+      <!-- Đơn hàng gần đây -->
       <div class="col-12">
         <div class="card">
-          <div class="card-header border-0 d-flex justify-content-between">
-            <h3 class="card-title">Thống kê truy cập</h3>
-            <div class="d-flex">
-                <select class="form-select form-select-sm me-2">
-                    <option>7 ngày qua</option>
-                    <option>Tháng này</option>
-                </select>
-            </div>
+          <div class="card-header">
+            <h3 class="card-title">Đơn hàng gần đây</h3>
           </div>
-          <div class="card-body">
-            <div id="chart-stats" style="min-height: 300px;"></div>
+          <div class="table-responsive">
+            <table class="table table-vcenter card-table">
+              <thead>
+                <tr>
+                  <th>Mã đơn</th>
+                  <th>Khách hàng</th>
+                  <th>Ngày đặt</th>
+                  <th>Tổng tiền</th>
+                  <th>Trạng thái</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <?php if (empty($recentOrders)): ?>
+                <tr>
+                  <td colspan="6" class="text-center text-muted py-4">
+                    <i class="ti ti-inbox fs-1 mb-2"></i>
+                    <p>Chưa có đơn hàng nào</p>
+                  </td>
+                </tr>
+                <?php else: ?>
+                  <?php foreach ($recentOrders as $order): ?>
+                  <tr>
+                    <td class="text-secondary">
+                      <?php echo htmlspecialchars($order['order_number']); ?>
+                    </td>
+                    <td class="text-secondary"><?php echo htmlspecialchars($order['full_name']); ?></td>
+                    <td class="text-secondary"><?php echo date('d/m/Y H:i', strtotime($order['order_date'])); ?></td>
+                    <td class="text-secondary fw-bold"><?php echo number_format($order['final_amount'], 0, ',', '.'); ?>đ</td>
+                    <td>
+                      <?php
+                      $badges = [
+                          'pending' => 'badge bg-yellow',
+                          'confirmed' => 'badge bg-blue',
+                          'shipping' => 'badge bg-cyan',
+                          'delivered' => 'badge bg-green',
+                          'cancelled' => 'badge bg-red'
+                      ];
+                      $statusText = [
+                          'pending' => 'Chờ xác nhận',
+                          'confirmed' => 'Đã xác nhận',
+                          'shipping' => 'Đang giao',
+                          'delivered' => 'Đã giao',
+                          'cancelled' => 'Đã hủy'
+                      ];
+                      ?>
+                      <span class="<?php echo $badges[$order['status']]; ?>">
+                        <?php echo $statusText[$order['status']]; ?>
+                      </span>
+                    </td>
+                    <td class="text-end">
+                      <a href="<?php echo WEBROOT; ?>/admin/orderDetail/<?php echo $order['order_id']; ?>" class="btn btn-sm btn-primary">
+                        Chi tiết
+                      </a>
+                    </td>
+                  </tr>
+                  <?php endforeach; ?>
+                <?php endif; ?>
+              </tbody>
+            </table>
           </div>
+          <?php if (!empty($recentOrders)): ?>
+          <div class="card-footer text-center">
+            <a href="<?php echo WEBROOT; ?>/admin/orders" class="btn btn-link">
+              Xem tất cả đơn hàng <i class="ti ti-arrow-right ms-1"></i>
+            </a>
+          </div>
+          <?php endif; ?>
         </div>
       </div>
 
@@ -149,104 +208,128 @@
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     
-    // 1. Cấu hình Biểu đồ Cột (Sales)
-    var optionsSales = {
+    // 1. Biểu đồ Doanh thu 7 ngày
+    <?php
+    $dates = [];
+    $revenues = [];
+    foreach ($weeklyRevenue as $item) {
+        $dayName = date('d/m', strtotime($item['date']));
+        $dates[] = "'" . $dayName . "'";
+        $revenues[] = $item['revenue'];
+    }
+    ?>
+    
+    var optionsRevenue = {
       series: [{
         name: 'Doanh thu',
-        data: [44, 55, 57, 56, 61, 58, 63, 60, 66]
-      }, {
-        name: 'Lợi nhuận',
-        data: [76, 85, 101, 98, 87, 105, 91, 114, 94]
+        data: [<?php echo implode(',', $revenues); ?>]
       }],
       chart: {
-        type: 'bar',
-        height: 350,
-        toolbar: { show: false }
-      },
-      plotOptions: {
-        bar: {
-          horizontal: false,
-          columnWidth: '55%',
-          endingShape: 'rounded',
-          borderRadius: 4
-        },
+        type: 'area',
+        height: 300,
+        toolbar: { show: false },
+        zoom: { enabled: false }
       },
       dataLabels: { enabled: false },
-      stroke: { show: true, width: 2, colors: ['transparent'] },
-      xaxis: {
-        categories: ['Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
+      stroke: { 
+        curve: 'smooth',
+        width: 3
       },
-      colors: ['#4263eb', '#e1e6f9'], // Màu xanh Tabler
-      fill: { opacity: 1 },
-    };
-    var chartSales = new ApexCharts(document.querySelector("#chart-sales"), optionsSales);
-    chartSales.render();
-
-
-    // 2. Cấu hình Biểu đồ Tròn (Target)
-    var optionsTarget = {
-      series: [75],
-      chart: {
-        height: 300,
-        type: 'radialBar',
-      },
-      plotOptions: {
-        radialBar: {
-          hollow: { size: '70%' },
-          dataLabels: {
-            show: true,
-            name: { show: false },
-            value: {
-              fontSize: '36px',
-              fontWeight: 'bold',
-              color: '#4263eb',
-              offsetY: 10,
-              formatter: function (val) {
-                return val + "%";
-              }
-            }
-          },
-          track: { background: '#f4f6fa' } // Màu nền vòng tròn
-        },
-      },
-      labels: ['Target'],
-      colors: ['#4263eb'],
-      stroke: { lineCap: 'round' },
-    };
-    var chartTarget = new ApexCharts(document.querySelector("#chart-target"), optionsTarget);
-    chartTarget.render();
-
-
-    // 3. Cấu hình Biểu đồ Đường (Statistics)
-    var optionsStats = {
-      series: [{
-        name: "Lượt xem",
-        data: [10, 41, 35, 51, 49, 62, 69, 91, 148]
-      }],
-      chart: {
-        height: 300,
-        type: 'area', // Loại Area để có màu nền ở dưới
-        zoom: { enabled: false },
-        toolbar: { show: false }
-      },
-      dataLabels: { enabled: false },
-      stroke: { curve: 'smooth', width: 2 },
       fill: {
         type: 'gradient',
         gradient: {
           shadeIntensity: 1,
-          opacityFrom: 0.4, // Độ mờ bắt đầu
-          opacityTo: 0.0,   // Độ mờ kết thúc
+          opacityFrom: 0.5,
+          opacityTo: 0.1,
           stops: [0, 100]
         }
       },
       xaxis: {
-        categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'],
+        categories: [<?php echo implode(',', $dates); ?>],
+        labels: {
+          style: {
+            fontSize: '12px'
+          }
+        }
       },
-      colors: ['#2fb344'], // Màu xanh lá
+      yaxis: {
+        labels: {
+          formatter: function (value) {
+            return new Intl.NumberFormat('vi-VN').format(value);
+          }
+        }
+      },
+      colors: ['#206bc4'],
+      tooltip: {
+        y: {
+          formatter: function (value) {
+            return new Intl.NumberFormat('vi-VN').format(value) + 'đ';
+          }
+        }
+      },
+      grid: {
+        borderColor: '#e7e7e7',
+        strokeDashArray: 5
+      }
     };
-    var chartStats = new ApexCharts(document.querySelector("#chart-stats"), optionsStats);
-    chartStats.render();
+    var chartRevenue = new ApexCharts(document.querySelector("#chart-revenue"), optionsRevenue);
+    chartRevenue.render();
+
+    // 2. Biểu đồ Trạng thái đơn hàng (Donut Chart)
+    <?php
+    $statusNames = [
+        'pending' => 'Chờ xác nhận',
+        'confirmed' => 'Đã xác nhận',
+        'shipping' => 'Đang giao',
+        'delivered' => 'Đã giao',
+        'cancelled' => 'Đã hủy'
+    ];
+    
+    $statusLabels = [];
+    $statusCounts = [];
+    foreach ($orderStats as $stat) {
+        $statusLabels[] = "'" . $statusNames[$stat['status']] . "'";
+        $statusCounts[] = $stat['count'];
+    }
+    ?>
+    
+    var optionsOrderStatus = {
+      series: [<?php echo implode(',', $statusCounts); ?>],
+      chart: {
+        type: 'donut',
+        height: 300
+      },
+      labels: [<?php echo implode(',', $statusLabels); ?>],
+      colors: ['#f59f00', '#206bc4', '#4299e1', '#2fb344', '#d63939'],
+      legend: {
+        position: 'bottom',
+        fontSize: '13px'
+      },
+      plotOptions: {
+        pie: {
+          donut: {
+            size: '70%',
+            labels: {
+              show: true,
+              total: {
+                show: true,
+                label: 'Tổng đơn',
+                fontSize: '14px',
+                color: '#666',
+                formatter: function (w) {
+                  return w.globals.seriesTotals.reduce((a, b) => a + b, 0);
+                }
+              }
+            }
+          }
+        }
+      },
+      dataLabels: {
+        enabled: false
+      }
+    };
+    var chartOrderStatus = new ApexCharts(document.querySelector("#chart-order-status"), optionsOrderStatus);
+    chartOrderStatus.render();
 
   });
 </script>

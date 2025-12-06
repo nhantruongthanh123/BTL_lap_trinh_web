@@ -233,4 +233,78 @@ class OrderModel extends BaseModel {
 
         return true;
     }
+
+    public function getWeeklyRevenue() {
+        $sql = "SELECT 
+                    DATE(order_date) as date,
+                    SUM(final_amount) as revenue,
+                    COUNT(*) as order_count
+                FROM {$this->table}
+                WHERE payment_status = 'paid' 
+                AND order_date >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+                GROUP BY DATE(order_date)
+                ORDER BY date ASC";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        // Đảm bảo có đủ 7 ngày
+        $data = [];
+        for ($i = 6; $i >= 0; $i--) {
+            $date = date('Y-m-d', strtotime("-$i days"));
+            $found = false;
+            foreach ($result as $row) {
+                if ($row['date'] === $date) {
+                    $data[] = $row;
+                    $found = true;
+                    break;
+                }
+            }
+            if (!$found) {
+                $data[] = [
+                    'date' => $date,
+                    'revenue' => 0,
+                    'order_count' => 0
+                ];
+            }
+        }
+        
+        return $data;
+    }
+
+    // Thống kê trạng thái đơn hàng
+    public function getOrderStatistics() {
+        $sql = "SELECT 
+                    status,
+                    COUNT(*) as count
+                FROM {$this->table}
+                GROUP BY status";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        // Đảm bảo có đủ các trạng thái
+        $statuses = ['pending', 'confirmed', 'shipping', 'delivered', 'cancelled'];
+        $data = [];
+        foreach ($statuses as $status) {
+            $found = false;
+            foreach ($result as $row) {
+                if ($row['status'] === $status) {
+                    $data[] = $row;
+                    $found = true;
+                    break;
+                }
+            }
+            if (!$found) {
+                $data[] = [
+                    'status' => $status,
+                    'count' => 0
+                ];
+            }
+        }
+        
+        return $data;
+    }
 }
