@@ -1,10 +1,10 @@
 <?php
 class Home extends BaseController {
-    public $model;
+    public $homeModel;
     public $categoryModel;
 
     public function __construct() {
-        $this->model = $this->model('HomeModel');
+        $this->homeModel = $this->model('HomeModel');
         $this->categoryModel = $this->model('CategoryModel');
     }
 
@@ -15,7 +15,7 @@ class Home extends BaseController {
                     'categories' => $categories];
 
         $this->render('Block/header', $data);
-        $this->render('Home/index', ['products' => $this->model->getListBooks(8)]);
+        $this->render('Home/index', ['products' => $this->homeModel->getListBooks(8)]);
         $this->render('Block/footer');
     }
 }
