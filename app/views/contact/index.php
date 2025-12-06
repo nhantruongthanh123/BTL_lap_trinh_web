@@ -63,15 +63,6 @@
             box-shadow: none;
             border-color: #0d6efd;
         }
-        
-        /* Bản đồ */
-        .map-container {
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            height: 100%;
-            min-height: 300px;
-        }
     </style>
 </head>
 <body>
@@ -120,17 +111,14 @@
                     <p class="text-muted mb-0 small">support@bookstore.com</p>
                 </div>
             </div>
-
-            <div class="map-container mt-4">
-                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3918.092636259068!2d106.8053770748065!3d10.87997238927515!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3174d8a5568c997f%3A0xdeac05f17a166e06!2zVHLGsOG7nW5nIMSQ4bqhaSBo4buNYyBCw6FjaCBraG9hIC0gxJBIUUcgVFAuSGNtIChjxqEgc-G7nyAyKQ!5e0!3m2!1svi!2s!4v1701837000000!5m2!1svi!2s" 
-                        width="100%" height="300" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+            
             </div>
-        </div>
 
         <div class="col-lg-7">
             <div class="contact-form-card h-100">
                 <h3 class="fw-bold mb-4">Gửi tin nhắn cho chúng tôi</h3>
-                <form action="#" method="POST"> <div class="row g-3">
+                <form action="#" method="POST"> 
+                    <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label fw-bold small">Họ và tên</label>
                             <input type="text" class="form-control" placeholder="Nhập tên của bạn">
