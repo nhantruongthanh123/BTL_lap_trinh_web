@@ -236,15 +236,87 @@ INSERT INTO reviews (book_id, user_id, rating, comment, is_approved) VALUES
 (5, 16, 4, 'Phần mô tả tâm lý nhân vật rất hay.', 1);
 
 
+INSERT INTO coupons (code, discount_type, min_order_value, discount_value, expiration_date, is_active) VALUES
+('FREESHIP2025', 'free_shipping', 150000, 15000, '2025-12-31', 1),
+('SAVE20', 'fixed_amount', 200000, 20000, '2025-12-31', 1),
+('BIGCOUPON', 'fixed_amount', 500000, 30000, '2025-12-31', 1);
 
-INSERT INTO orders (user_id, total_amount, shipping_fee, discount_amount, final_amount, status, payment_status, order_number, shipping_address, coupon_code) VALUES
-(2, 145000, 15000, 15000, 145000, 'delivered', 'paid', 'ORD-2025-001', '123 Đường Láng, Hà Nội', 'FREESHIP2025');
+
+
+INSERT INTO orders (user_id, total_amount, shipping_fee, discount_amount, final_amount, order_date, status, payment_status, order_number, shipping_address, coupon_code) VALUES
+(3, 155000, 15000, 15000, 155000, '2025-11-11', 'delivered', 'paid', 'ORD-2025-001', '123 Đường Láng, Hà Nội', 'FREESHIP2025'),
+(3, 99000, 15000, 0, 114000, '2025-11-11', 'delivered', 'paid', 'ORD-2025-002', '123 Đường Láng, Hà Nội', NULL),
+(4, 374000, 15000, 20000, 354000, '2025-11-12', 'delivered', 'paid', 'ORD-2025-003', '456 Lê Lợi, TP.HCM', 'SAVE20'),
+(5, 630000, 15000, 30000, 615000, '2025-11-13', 'delivered', 'paid', 'ORD-2025-004', '12 Hai Bà Trưng, Hà Nội', 'BIGCOUPON'),
+(6, 440000, 15000, 20000, 425000, '2025-11-14', 'delivered', 'paid', 'ORD-2025-005', '88 Nguyễn Huệ, Đà Nẵng', 'SAVE20'),
+(7, 250000, 15000, 15000, 250000, '2025-11-15', 'delivered', 'paid', 'ORD-2025-006', '23 Trần Phú, Hải Phòng', 'FREESHIP2025'),
+(8, 62000, 15000, 0, 77000, '2025-11-16', 'delivered', 'paid', 'ORD-2025-007', '55 Lạch Tray, Hải Phòng', NULL),
+(9, 360000, 15000, 20000, 355000, '2025-11-17', 'delivered', 'paid', 'ORD-2025-008', '101 Võ Thị Sáu, TP.HCM', 'SAVE20'),
+(9, 350000, 15000, 20000, 365000, '2025-11-18', 'delivered', 'paid', 'ORD-2025-009', '101 Võ Thị Sáu, TP.HCM', 'SAVE20'),
+(10, 210000, 15000, 15000, 210000, '2025-11-19', 'delivered', 'paid', 'ORD-2025-010', '78 Bạch Đằng, Đà Nẵng', 'FREESHIP2025'),
+(11, 370000, 15000, 20000, 355000, '2025-11-20', 'delivered', 'paid', 'ORD-2025-011', '66 Nguyễn Trãi, Hà Nội', 'SAVE20'),
+(12, 225000, 15000, 15000, 225000, '2025-11-21', 'delivered', 'paid', 'ORD-2025-012', '09 Lý Tự Trọng, Cần Thơ', 'FREESHIP2025'),
+(13, 130000, 15000, 0, 145000, '2025-11-22', 'delivered', 'paid', 'ORD-2025-013', '44 Lê Duẩn, Hà Nội', NULL),
+(14, 560000, 15000, 30000, 545000, '2025-11-23', 'delivered', 'paid', 'ORD-2025-014', '102 Lê Lợi, Huế', 'BIGCOUPON'),
+(15, 170000, 15000, 15000, 170000, '2025-11-24', 'delivered', 'paid', 'ORD-2025-015', '200 Bình Long, TP.HCM', 'FREESHIP2025');
+
+
 
 INSERT INTO order_items (order_id, book_id, quantity, price, subtotal) VALUES
-(1, 2, 1, 85000, 85000),
-(1, 3, 1, 60000, 60000);
+(1, 2, 1, 70000, 85000),
+(1, 3, 1, 85000, 60000),
+
+(2, 1, 1, 99000, 99000),
+
+(3, 6, 1, 79000, 79000),
+(3, 14, 1, 85000, 66000),
+(3, 15, 1, 100000, 100000),
+(3, 29, 1, 110000, 110000),
+
+(4, 7, 1, 130000, 130000),
+(4, 8, 1, 150000, 150000),
+(4, 9, 1, 220000, 220000),
+(4, 30, 1, 130000, 130000),
+
+(5, 7, 1, 130000, 130000),
+(5, 8, 1, 150000, 150000),
+(5, 9, 1, 160000, 160000),
+
+(6, 17, 1, 80000, 80000),
+(6, 18, 1, 85000, 85000),
+(6, 19, 1, 85000, 85000),
+
+(7, 26, 1, 20000, 20000),
+(7, 27, 1, 22000, 22000),
+(7, 28, 1, 20000, 20000),
+
+(8, 36, 1, 110000, 110000),
+(8, 37, 1, 120000, 120000),
+(8, 38, 1, 130000, 130000),
+
+(9, 41, 1, 130000, 130000),
+(9, 43, 1, 110000, 110000),
+(9, 44, 1, 110000, 110000),
+
+(10, 2, 2, 70000, 140000),
+(10, 5, 1, 70000, 70000),
+
+(11, 12, 1, 190000, 190000),
+(11, 13, 1, 180000, 180000),
+
+(12, 15, 1, 100000, 100000),
+(12, 31, 1, 125000, 125000),
+
+(13, 32, 1, 130000, 130000),
+
+(14, 33, 1, 180000, 180000),
+(14, 34, 1, 170000, 170000),
+(14, 35, 1, 180000, 180000),
+
+(15, 24, 1, 80000, 80000),
+(15, 25, 1, 90000, 90000);
 
 
-INSERT INTO coupons (code, discount_type, min_order_value, discount_value, expiration_date, is_active) VALUES
-('FREESHIP2025', 'free_shipping', 100000, 15000, '2025-12-31', 1),
-('SAVE20', 'fixed_amount', 200000, 20000, '2025-12-31', 1);
+
+
+

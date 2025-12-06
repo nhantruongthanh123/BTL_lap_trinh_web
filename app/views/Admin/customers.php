@@ -8,7 +8,7 @@
       <div class="col-auto ms-auto d-print-none">
         <span class="badge bg-blue-lt fs-5">
           <i class="ti ti-users me-1"></i>
-          Tổng: <?php echo count($customers); ?> khách hàng
+          Tổng: <?php echo $totalCustomers; ?> khách hàng
         </span>
       </div>
     </div>
@@ -63,131 +63,148 @@
             </tr>
           </thead>
           <tbody>
-            <?php if (!empty($customers)): ?>
-              <?php foreach ($customers as $customer): ?>
-                <tr>
-                  <!-- AVATAR -->
-                  <td>
-                    <?php 
-                    $avatarUrl = !empty($customer['avatar']) 
-                        ? WEBROOT . '/public/assets/Clients/avatars/' . $customer['avatar']
-                        : WEBROOT . '/public/assets/Clients/avatars/default-avatar.png';
-                    ?>
-                    <span class="avatar avatar-md rounded" 
-                          style="background-image: url('<?php echo $avatarUrl; ?>')">
-                    </span>
-                  </td>
+            <?php if (!empty($paginatedCustomers)): ?>
+                <?php foreach ($paginatedCustomers as $customer): ?>
+                    <tr>
+                        <!-- AVATAR -->
+                        <td>
+                            <?php 
+                            $avatarUrl = !empty($customer['avatar']) 
+                                ? WEBROOT . '/public/assets/Clients/avatars/' . $customer['avatar']
+                                : WEBROOT . '/public/assets/Clients/avatars/default-avatar.png';
+                            ?>
+                            <span class="avatar avatar-md rounded" 
+                                  style="background-image: url('<?php echo $avatarUrl; ?>')">
+                            </span>
+                        </td>
 
-                  <!-- THÔNG TIN KHÁCH HÀNG -->
-                  <td>
-                    <div>
-                      <div class="fw-bold"><?php echo htmlspecialchars($customer['full_name'] ?? 'Chưa cập nhật'); ?></div>
-                      <div class="text-muted small">
-                        <i class="ti ti-mail me-1"></i>
-                        <?php echo htmlspecialchars($customer['email']); ?>
-                      </div>
-                      <?php if (!empty($customer['phone'])): ?>
-                      <div class="text-muted small">
-                        <i class="ti ti-phone me-1"></i>
-                        <?php echo htmlspecialchars($customer['phone']); ?>
-                      </div>
-                      <?php endif; ?>
-                    </div>
-                  </td>
+                        <!-- THÔNG TIN KHÁCH HÀNG -->
+                        <td>
+                            <div>
+                                <div class="fw-bold"><?php echo htmlspecialchars($customer['full_name'] ?? 'Chưa cập nhật'); ?></div>
+                                <div class="text-muted small">
+                                    <i class="ti ti-mail me-1"></i>
+                                    <?php echo htmlspecialchars($customer['email']); ?>
+                                </div>
+                                <?php if (!empty($customer['phone'])): ?>
+                                <div class="text-muted small">
+                                    <i class="ti ti-phone me-1"></i>
+                                    <?php echo htmlspecialchars($customer['phone']); ?>
+                                </div>
+                                <?php endif; ?>
+                            </div>
+                        </td>
 
-                  <!-- USERNAME -->
-                  <td>
-                    <code class="text-muted"><?php echo htmlspecialchars($customer['username']); ?></code>
-                  </td>
+                        <!-- USERNAME -->
+                        <td>
+                            <code class="text-muted"><?php echo htmlspecialchars($customer['username']); ?></code>
+                        </td>
 
-                  <!-- SỐ ĐƠN HÀNG -->
-                  <td class="text-center">
-                    <?php if ($customer['total_orders'] > 0): ?>
-                        <i class="ti ti-shopping-cart me-1"></i>
-                        <?php echo $customer['total_orders']; ?>
-                      </a>
-                    <?php else: ?>
-                      <span class="text-muted">0</span>
-                    <?php endif; ?>
-                  </td>
+                        <!-- SỐ ĐƠN HÀNG -->
+                        <td class="text-center">
+                            <span class="badge bg-azure-lt fs-6">
+                                <?php echo $customer['total_orders']; ?> đơn
+                            </span>
+                        </td>
 
-                  <!-- TỔNG CHI TIÊU -->
-                  <td class="text-center">
-                    <?php if ($customer['total_spent'] > 0): ?>
-                      <span class="fw-bold text-success">
-                        <?php echo number_format($customer['total_spent'], 0, ',', '.'); ?> ₫
-                      </span>
-                    <?php else: ?>
-                      <span class="text-muted">0 ₫</span>
-                    <?php endif; ?>
-                  </td>
+                        <!-- TỔNG CHI TIÊU -->
+                        <td class="text-center">
+                            <span class="text-success fw-bold">
+                                <?php echo number_format($customer['total_spent']); ?> ₫
+                            </span>
+                        </td>
 
-                  <!-- TRẠNG THÁI -->
-                  <td class="text-center">
-                    <?php if ($customer['is_active']): ?>
-                      <span class="badge bg-success-lt">
-                        <i class="ti ti-check me-1"></i>Hoạt động
-                      </span>
-                    <?php else: ?>
-                      <span class="badge bg-danger-lt">
-                        <i class="ti ti-lock me-1"></i>Bị khóa
-                      </span>
-                    <?php endif; ?>
-                  </td>
+                        <!-- TRẠNG THÁI -->
+                        <td class="text-center">
+                            <?php if ($customer['is_active']): ?>
+                                <span class="badge bg-success-lt">
+                                    <i class="ti ti-check me-1"></i>Hoạt động
+                                </span>
+                            <?php else: ?>
+                                <span class="badge bg-secondary-lt">
+                                    <i class="ti ti-ban me-1"></i>Vô hiệu hóa
+                                </span>
+                            <?php endif; ?>
+                        </td>
 
-                  <!-- THAO TÁC -->
-                  <td class="text-center">
-                    <div class="btn-group" role="group">
-                      
-                      <!-- Khóa/Mở khóa -->
-                      <button type="button" 
-                              class="btn btn-sm btn-icon <?php echo $customer['is_active'] ? 'btn-outline-warning' : 'btn-outline-success'; ?>"
-                              onclick="toggleStatus(<?php echo $customer['user_id']; ?>, '<?php echo htmlspecialchars($customer['full_name']); ?>', <?php echo $customer['is_active']; ?>)"
-                              title="<?php echo $customer['is_active'] ? 'Khóa tài khoản' : 'Mở khóa tài khoản'; ?>"
-                              <?php echo ($customer['user_id'] == $_SESSION['user_id']) ? 'disabled' : ''; ?>>
-                        <i class="ti <?php echo $customer['is_active'] ? 'ti-lock' : 'ti-lock-open'; ?>"></i>
-                      </button>
+                        <!-- THAO TÁC -->
+                        <td class="text-center">
+                            <a href="<?php echo WEBROOT; ?>/admin/toggleCustomerStatus/<?php echo $customer['user_id']; ?>" 
+                              class="btn btn-sm btn-icon <?php echo $customer['is_active'] ? 'btn-ghost-warning' : 'btn-ghost-success'; ?>"
+                              onclick="return confirm('<?php echo $customer['is_active'] ? 'Vô hiệu hóa' : 'Kích hoạt'; ?> tài khoản này?')"
+                              title="<?php echo $customer['is_active'] ? 'Vô hiệu hóa' : 'Kích hoạt'; ?>">
+                                <i class="ti ti-<?php echo $customer['is_active'] ? 'ban' : 'check'; ?>"></i>
+                            </a>
 
-                      <!-- Xem đơn hàng -->
-                      <a href="<?php echo WEBROOT; ?>/admin/orders?user=<?php echo $customer['user_id']; ?>" 
-                         class="btn btn-sm btn-icon btn-outline-info"
-                         title="Xem đơn hàng">
-                        <i class="ti ti-shopping-cart"></i>
-                      </a>
-
-                    </div>
-                  </td>
-
-                </tr>
-              <?php endforeach; ?>
+                            <?php if ($customer['user_id'] != $_SESSION['user_id']): ?>
+                                <a href="<?php echo WEBROOT; ?>/admin/deleteCustomer/<?php echo $customer['user_id']; ?>" 
+                                  class="btn btn-sm btn-icon btn-ghost-danger"
+                                  onclick="return confirm('Xóa khách hàng này? Không thể hoàn tác!')"
+                                  title="Xóa">
+                                    <i class="ti ti-trash"></i>
+                                </a>
+                            <?php else: ?>
+                                <button class="btn btn-sm btn-icon btn-ghost-secondary" 
+                                        disabled
+                                        title="Không thể xóa chính mình">
+                                    <i class="ti ti-lock"></i>
+                                </button>
+                            <?php endif; ?>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
             <?php else: ?>
-              <tr>
-                <td colspan="8" class="text-center py-5">
-                  <div class="empty">
-                    <div class="empty-img">
-                      <i class="ti ti-users-off" style="font-size: 4rem; opacity: 0.3;"></i>
-                    </div>
-                    <p class="empty-title">Chưa có khách hàng nào</p>
-                    <p class="empty-subtitle text-muted">
-                      Khách hàng sẽ xuất hiện sau khi đăng ký
-                    </p>
-                  </div>
-                </td>
-              </tr>
+                <tr>
+                    <td colspan="7" class="text-center text-muted py-5">Chưa có khách hàng nào</td>
+                </tr>
             <?php endif; ?>
-          </tbody>
+        </tbody>
         </table>
       </div>
-
-      <!-- FOOTER -->
+      
       <div class="card-footer d-flex align-items-center">
         <p class="m-0 text-muted">
-          Hiển thị <strong><?php echo count($customers); ?></strong> khách hàng
+            Hiển thị <span><?php echo count($paginatedCustomers); ?></span> / <strong><?php echo $totalCustomers; ?></strong> khách hàng
         </p>
+        
+        <?php if ($totalPages > 1): ?>
+        <ul class="pagination m-0 ms-auto">
+            <li class="page-item <?php echo ($currentPage <= 1) ? 'disabled' : ''; ?>">
+                <a class="page-link" href="<?php echo WEBROOT; ?>/admin/customers?page=<?php echo $currentPage - 1; ?>">
+                    <i class="ti ti-chevron-left"></i>
+                </a>
+            </li>
+
+            <?php
+                $range = 2;
+                for ($i = 1; $i <= $totalPages; $i++) {
+                    if ($i == 1 || $i == $totalPages || ($i >= $currentPage - $range && $i <= $currentPage + $range)) {
+                        ?>
+                        <li class="page-item <?php echo ($i == $currentPage) ? 'active' : ''; ?>">
+                            <a class="page-link" href="<?php echo WEBROOT; ?>/admin/customers?page=<?php echo $i; ?>">
+                                <?php echo $i; ?>
+                            </a>
+                        </li>
+                        <?php
+                    } 
+                    elseif ($i == $currentPage - $range - 1 || $i == $currentPage + $range + 1) {
+                        ?>
+                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                        <?php
+                    }
+                }
+            ?>
+
+            <li class="page-item <?php echo ($currentPage >= $totalPages) ? 'disabled' : ''; ?>">
+                <a class="page-link" href="<?php echo WEBROOT; ?>/admin/customers?page=<?php echo $currentPage + 1; ?>">
+                    <i class="ti ti-chevron-right"></i>
+                </a>
+            </li>
+        </ul>
+        <?php endif; ?>
       </div>
 
     </div>
-
   </div>
 </div>
 
@@ -223,27 +240,141 @@ function removeVietnameseTones(str) {
     return str.toLowerCase().trim();
 }
 
-// TÌM KIẾM KHÁCH HÀNG
-document.getElementById('searchInput')?.addEventListener('input', function(e) {
-    const keyword = removeVietnameseTones(e.target.value);
-    const rows = document.querySelectorAll('#customerTable tbody tr');
-    
-    rows.forEach(row => {
-        const cells = row.cells;
-        if (!cells || cells.length < 4) return;
+function removeVietnameseTones(str) {
+    str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g,"a"); 
+    str = str.replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g,"e"); 
+    str = str.replace(/ì|í|ị|ỉ|ĩ/g,"i"); 
+    str = str.replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g,"o"); 
+    str = str.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g,"u"); 
+    str = str.replace(/ỳ|ý|ỵ|ỷ|ỹ/g,"y"); 
+    str = str.replace(/đ/g,"d");
+    str = str.replace(/À|Á|Ạ|Ả|Ã|Â|Ầ|Ấ|Ậ|Ẩ|Ẫ|Ă|Ằ|Ắ|Ặ|Ẳ|Ẵ/g, "A");
+    str = str.replace(/È|É|Ẹ|Ẻ|Ẽ|Ê|Ề|Ế|Ệ|Ể|Ễ/g, "E");
+    str = str.replace(/Ì|Í|Ị|Ỉ|Ĩ/g, "I");
+    str = str.replace(/Ò|Ó|Ọ|Ỏ|Õ|Ô|Ồ|Ố|Ộ|Ổ|Ỗ|Ơ|Ờ|Ớ|Ợ|Ở|Ỡ/g, "O");
+    str = str.replace(/Ù|Ú|Ụ|Ủ|Ũ|Ư|Ừ|Ứ|Ự|Ử|Ữ/g, "U");
+    str = str.replace(/Ỳ|Ý|Ỵ|Ỷ|Ỹ/g, "Y");
+    str = str.replace(/Đ/g, "D");
+    str = str.replace(/\u0300|\u0301|\u0303|\u0309|\u0323/g, ""); 
+    return str.toLowerCase().trim();
+}
+
+const allCustomers = <?php echo json_encode($customers); ?>;
+const searchInput = document.getElementById('searchInput');
+const tableBody = document.querySelector('#customerTable tbody');
+const pagination = document.querySelector('.card-footer');
+
+if (searchInput) {
+    searchInput.addEventListener('input', function(e) {
+        const keyword = removeVietnameseTones(e.target.value);
         
-        const fullName = cells[2]?.innerText || '';
-        const username = cells[3]?.innerText || '';
-        
-        const rowText = removeVietnameseTones(fullName + " " + username);
-        
-        if (rowText.includes(keyword)) {
-            row.style.display = '';
-        } else {
-            row.style.display = 'none';
+        if (keyword === '') {
+            location.reload();
+            return;
         }
+        
+        if (pagination) {
+            pagination.style.display = 'none';
+        }
+        
+        const filtered = allCustomers.filter(customer => {
+            const searchText = removeVietnameseTones(
+                (customer.full_name || '') + ' ' + 
+                customer.email + ' ' + 
+                customer.username + ' ' + 
+                (customer.phone || '')
+            );
+            return searchText.includes(keyword);
+        });
+        
+        renderCustomers(filtered);
     });
-});
+}
+
+function renderCustomers(customers) {
+    if (customers.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-5">Không tìm thấy khách hàng phù hợp</td></tr>';
+        return;
+    }
+    
+    let html = '';
+    customers.forEach(customer => {
+        const avatarUrl = customer.avatar 
+            ? '<?php echo WEBROOT; ?>/public/assets/Clients/avatars/' + customer.avatar
+            : '<?php echo WEBROOT; ?>/public/assets/Clients/avatars/default-avatar.png';
+        
+        const isActive = customer.is_active == 1;
+        const canDelete = customer.user_id != <?php echo $_SESSION['user_id']; ?>;
+        
+        html += `
+            <tr>
+                <td>
+                    <span class="avatar avatar-md rounded" 
+                          style="background-image: url('${avatarUrl}')">
+                    </span>
+                </td>
+                <td>
+                    <div>
+                        <div class="fw-bold">${escapeHtml(customer.full_name || 'Chưa cập nhật')}</div>
+                        <div class="text-muted small">
+                            <i class="ti ti-mail me-1"></i>${escapeHtml(customer.email)}
+                        </div>
+                        ${customer.phone ? `<div class="text-muted small"><i class="ti ti-phone me-1"></i>${escapeHtml(customer.phone)}</div>` : ''}
+                    </div>
+                </td>
+                <td>
+                    <code class="text-muted">${escapeHtml(customer.username)}</code>
+                </td>
+                <td class="text-center">
+                    <span class="badge bg-azure-lt fs-6">${customer.total_orders} đơn</span>
+                </td>
+                <td class="text-center">
+                    <span class="text-success fw-bold">${formatPrice(customer.total_spent)} ₫</span>
+                </td>
+                <td class="text-center">
+                    ${isActive ? 
+                        '<span class="badge bg-success-lt"><i class="ti ti-check me-1"></i>Hoạt động</span>' : 
+                        '<span class="badge bg-secondary-lt"><i class="ti ti-ban me-1"></i>Vô hiệu hóa</span>'
+                    }
+                </td>
+                <td class="text-center">
+                    <a href="<?php echo WEBROOT; ?>/admin/toggleCustomerStatus/${customer.user_id}" 
+                       class="btn btn-sm btn-icon ${isActive ? 'btn-ghost-warning' : 'btn-ghost-success'}"
+                       onclick="return confirm('${isActive ? 'Vô hiệu hóa' : 'Kích hoạt'} tài khoản này?')"
+                       title="${isActive ? 'Vô hiệu hóa' : 'Kích hoạt'}">
+                        <i class="ti ti-${isActive ? 'ban' : 'check'}"></i>
+                    </a>
+                    ${canDelete ? `
+                        <a href="<?php echo WEBROOT; ?>/admin/deleteCustomer/${customer.user_id}" 
+                           class="btn btn-sm btn-icon btn-ghost-danger"
+                           onclick="return confirm('Xóa khách hàng này? Không thể hoàn tác!')"
+                           title="Xóa">
+                            <i class="ti ti-trash"></i>
+                        </a>
+                    ` : `
+                        <button class="btn btn-sm btn-icon btn-ghost-secondary" 
+                                disabled
+                                title="Không thể xóa chính mình">
+                            <i class="ti ti-lock"></i>
+                        </button>
+                    `}
+                </td>
+            </tr>
+        `;
+    });
+    
+    tableBody.innerHTML = html;
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function formatPrice(price) {
+    return new Intl.NumberFormat('vi-VN').format(price);
+}
 </script>
 
 <style>

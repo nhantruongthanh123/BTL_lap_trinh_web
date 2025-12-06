@@ -133,7 +133,7 @@ CREATE TABLE orders (
     shipping_fee DECIMAL(10, 2) DEFAULT 15000,
     final_amount DECIMAL(10, 2) NOT NULL,
     status ENUM('pending', 'confirmed', 'processing', 'shipping', 'delivered', 'cancelled') DEFAULT 'pending',
-    payment_status ENUM('unpaid', 'paid', 'refunded') DEFAULT 'unpaid',
+    payment_status ENUM('unpaid', 'paid') DEFAULT 'unpaid',
     payment_method ENUM('cod', 'bank_transfer', 'momo') DEFAULT 'cod',
     note TEXT,
     shipping_address TEXT NOT NULL,

@@ -181,6 +181,28 @@ class UserModel extends BaseModel {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function getAllCustomersPaginated($limit = 10, $offset = 0){
+        $sql = "SELECT u.*, 
+                       COUNT(o.order_id) as total_orders, 
+                       COALESCE(SUM(o.final_amount), 0) as total_spent
+                FROM " . $this->table . " u
+                
+                -- THÊM ĐIỀU KIỆN TRONG JOIN (Quan trọng)
+                -- Chỉ join những đơn hàng đã thanh toán
+                LEFT JOIN orders o ON u.user_id = o.user_id AND o.payment_status = 'paid'
+                
+                WHERE u.role = 'customer'
+                GROUP BY u.user_id
+                ORDER BY u.user_id DESC
+                LIMIT :limit OFFSET :offset";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', (int)$offset, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function updateUserStatus($userId, $isActive) {
         $sql = "UPDATE users 
                 SET is_active = :is_active,

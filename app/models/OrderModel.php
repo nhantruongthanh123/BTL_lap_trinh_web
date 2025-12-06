@@ -3,7 +3,7 @@ class OrderModel extends BaseModel {
     protected $table = 'orders';
 
     public function getAllOrders(){
-        $sql = "SELECT o.*, u.full_name 
+        $sql = "SELECT o.*, u.full_name, u.email, u.phone 
                 FROM " . $this->table . " o
                 LEFT JOIN users u ON o.user_id = u.user_id
                 ORDER BY o.order_date DESC";
@@ -11,6 +11,30 @@ class OrderModel extends BaseModel {
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getAllOrdersPaginated($limit, $offset){
+        $sql = "SELECT o.*, u.full_name, u.email, u.phone
+                FROM " . $this->table . " o
+                LEFT JOIN users u ON o.user_id = u.user_id
+                ORDER BY o.order_date DESC
+                LIMIT :limit OFFSET :offset";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', (int)$offset, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function countAllOrders(){
+        $sql = "SELECT COUNT(*) as total FROM " . $this->table;
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result['total'];
     }
 
     // LẤY ĐƠN HÀNG THEO ID

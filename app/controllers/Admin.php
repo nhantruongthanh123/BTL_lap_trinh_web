@@ -870,12 +870,23 @@ class Admin extends BaseController {
             exit();
         }
 
+        $currentPage = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+        $perPage = 10;
+        $offset = ($currentPage - 1) * $perPage;
+
         $orders = $this->orderModel->getAllOrders();
+        $paginatedOrders = $this->orderModel->getAllOrdersPaginated($perPage, $offset);
+        $totalOrders = $this->orderModel->countAllOrders();
+        $totalPages = ceil($totalOrders / $perPage);
 
         $data = [
             'title' => 'Quản lý Đơn hàng',
             'page'  => 'orders',
             'orders' => $orders,
+            'paginatedOrders' => $paginatedOrders,
+            'currentPage'=> $currentPage,
+            'totalPages' => $totalPages,
+            'totalOrders' => $totalOrders,
             'success' => $_SESSION['admin_success'] ?? '',
             'error'   => $_SESSION['admin_error'] ?? ''
         ];
@@ -997,12 +1008,23 @@ class Admin extends BaseController {
             exit();
         }
 
+        $currentPage = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+        $perPage = 6;
+        $offset = ($currentPage - 1) * $perPage;
+
         $customers = $this->userModel->getAllCustomers();
+        $paginatedCustomers = $this->userModel->getAllCustomersPaginated($perPage, $offset);
+        $totalCustomers = $this->userModel->countCustomers();
+        $totalPages = ceil($totalCustomers / $perPage);
 
         $data = [
             'title' => 'Quản lý Khách hàng',
             'page'  => 'customers',
             'customers' => $customers,
+            'paginatedCustomers' => $paginatedCustomers,
+            'currentPage'=> $currentPage,
+            'totalPages' => $totalPages,
+            'totalCustomers' => $totalCustomers,
             'success' => $_SESSION['admin_success'] ?? '',
             'error'   => $_SESSION['admin_error'] ?? ''
         ];
