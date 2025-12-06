@@ -109,7 +109,6 @@ CREATE TABLE reviews (
     book_id INT NOT NULL,
     user_id INT NOT NULL,
     rating INT NOT NULL CHECK (rating BETWEEN 1 AND 5),
-    title VARCHAR(200),
     comment TEXT,
     is_verified_purchase BOOLEAN DEFAULT FALSE,
     is_approved BOOLEAN DEFAULT TRUE,
