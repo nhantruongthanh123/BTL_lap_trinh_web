@@ -624,12 +624,23 @@ class Admin extends BaseController {
             exit();
         }
 
+        $currentPage = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+        $perPage = 10;
+        $offset = ($currentPage - 1) * $perPage;
+
         $authors = $this->authorModel->getAllAuthors();
+        $paginatedAuthors = $this->authorModel->getAllAuthorsPaginated($perPage, $offset);
+        $totalAuthors = $this->authorModel->countAllAuthors();
+        $totalPages = ceil($totalAuthors / $perPage);
 
         $data = [
             'title' => 'Quản lý Tác giả',
             'page'  => 'authors',
             'authors' => $authors,
+            'paginatedAuthors' => $paginatedAuthors,
+            'currentPage'=> $currentPage,
+            'totalPages' => $totalPages,
+            'totalAuthors' => $totalAuthors,
             'success' => $_SESSION['admin_success'] ?? '',
             'error'   => $_SESSION['admin_error'] ?? ''
         ];

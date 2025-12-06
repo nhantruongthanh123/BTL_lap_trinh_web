@@ -15,12 +15,36 @@ class AuthorModel extends BaseModel {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function getAllAuthorsPaginated($limit = 10, $offset = 0) {
+        $sql = "SELECT a.*, COUNT(b.book_id) as book_count
+                FROM " . $this->table . " a
+                LEFT JOIN books b ON a.author_id = b.author_id
+                GROUP BY a.author_id
+                ORDER BY a.author_name ASC
+                LIMIT :limit OFFSET :offset";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', (int)$offset, PDO::PARAM_INT);
+        $stmt->execute();
+        
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function getAuthorById($id) {
         $sql = "SELECT * FROM " . $this->table . " WHERE author_id = :id";
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':id', $id, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function countAllAuthors() {
+        $sql = "SELECT COUNT(*) as total FROM " . $this->table;
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result['total'];
     }
 
     public function addAuthor($data) {

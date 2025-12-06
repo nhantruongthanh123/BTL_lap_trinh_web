@@ -1,5 +1,3 @@
-
-<!-- HEADER -->
 <div class="d-flex align-items-center justify-content-between px-4 py-3 border-bottom bg-white shadow-sm">
     <div>
         <h2 class="fw-bold mb-0">Tác giả</h2>
@@ -60,10 +58,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <?php if (!empty($authors)): ?>
-                        <?php foreach ($authors as $author): ?>
+                    <?php if (!empty($paginatedAuthors)): ?>
+                        <?php foreach ($paginatedAuthors as $author): ?>
                             <tr data-author-id="<?php echo $author['author_id']; ?>">
-
                                 <!-- TÊN tác giả -->
                                 <td>
                                     <div class="fw-bold"><?php echo htmlspecialchars($author['author_name']); ?></div>
@@ -73,7 +70,6 @@
                                         </div>
                                     <?php endif; ?>
                                 </td>
-
 
                                 <!-- QUỐC TỊCH -->
                                 <td>
@@ -98,76 +94,86 @@
                                 <!-- SỐ SÁCH -->
                                 <td class="text-center">
                                     <span class="badge bg-info-lt fs-6">
-                                        <?php echo $author['book_count'] ?? 0; ?> sách
+                                        <?php echo $author['book_count']; ?> sách
                                     </span>
                                 </td>
 
-
                                 <!-- THAO TÁC -->
                                 <td class="text-center">
-                                    <div class="btn-group" role="group">
-                                        <!-- Sửa -->
-                                        <button type="button" 
-                                                class="btn btn-sm btn-icon btn-outline-primary"
-                                                data-bs-toggle="modal" 
-                                                data-bs-target="#editAuthorModal"
-                                                onclick="editAuthor(<?php echo htmlspecialchars(json_encode($author)); ?>)"
-                                                title="Sửa">
-                                            <i class="ti ti-edit"></i>
-                                        </button>
-
-                                        <!-- Xóa -->
-                                        <button type="button" 
-                                                class="btn btn-sm btn-icon btn-outline-danger"
-                                                onclick="deleteAuthor(<?php echo $author['author_id']; ?>, '<?php echo htmlspecialchars($author['author_name']); ?>')"
-                                                title="Xóa">
+                                    <button class="btn btn-sm btn-icon btn-ghost-primary" 
+                                            onclick="editAuthor(<?php echo htmlspecialchars(json_encode($author)); ?>)"
+                                            title="Chỉnh sửa">
+                                        <i class="ti ti-edit"></i>
+                                    </button>
+                                    
+                                    <?php if ($author['book_count'] == 0): ?>
+                                        <a href="<?php echo WEBROOT; ?>/admin/authorDelete/<?php echo $author['author_id']; ?>" 
+                                        class="btn btn-sm btn-icon btn-ghost-danger"
+                                        onclick="return confirm('Bạn có chắc muốn xóa tác giả này?')"
+                                        title="Xóa">
                                             <i class="ti ti-trash"></i>
+                                        </a>
+                                    <?php else: ?>
+                                        <button class="btn btn-sm btn-icon btn-ghost-secondary" 
+                                                disabled
+                                                title="Không thể xóa vì đang có sách">
+                                            <i class="ti ti-lock"></i>
                                         </button>
-                                    </div>
+                                    <?php endif; ?>
                                 </td>
-
                             </tr>
                         <?php endforeach; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="7" class="text-center py-5">
-                                <div class="empty">
-                                    <div class="empty-img">
-                                        <i class="ti ti-folder-x" style="font-size: 4rem; opacity: 0.3;"></i>
-                                    </div>
-                                    <p class="empty-title">Chưa có tác giả nào</p>
-                                    <p class="empty-subtitle text-muted">
-                                        Nhấn nút "Thêm tác giả" để tạo tác giả mới
-                                    </p>
-                                </div>
-                            </td>
+                            <td colspan="5" class="text-center text-muted py-4">Chưa có tác giả nào</td>
                         </tr>
                     <?php endif; ?>
                 </tbody>
             </table>
         </div>
 
-        <!-- PAGINATION (Nếu cần) -->
-        <?php if (!empty($authors) && count($authors) > 10): ?>
+        <!-- PAGINATION -->
         <div class="card-footer d-flex align-items-center">
-            <p class="m-0 text-muted">Hiển thị <span>1</span> đến <span>10</span> trong tổng số <strong><?php echo count($authors); ?></strong> tác giả</p>
+            <p class="m-0 text-muted">
+                Hiển thị <span><?php echo count($paginatedAuthors); ?></span> / <strong><?php echo $totalAuthors; ?></strong> tác giả
+            </p>
+            
+            <?php if ($totalPages > 1): ?>
             <ul class="pagination m-0 ms-auto">
-                <li class="page-item disabled">
-                    <a class="page-link" href="#" tabindex="-1">
-                        <i class="ti ti-chevron-left"></i> Trước
+                <li class="page-item <?php echo ($currentPage <= 1) ? 'disabled' : ''; ?>">
+                    <a class="page-link" href="<?php echo WEBROOT; ?>/admin/authors?page=<?php echo $currentPage - 1; ?>">
+                        <i class="ti ti-chevron-left"></i>
                     </a>
                 </li>
-                <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                <li class="page-item">
-                    <a class="page-link" href="#">
-                        Sau <i class="ti ti-chevron-right"></i>
+
+                <?php
+                    $range = 2;
+                    for ($i = 1; $i <= $totalPages; $i++) {
+                        if ($i == 1 || $i == $totalPages || ($i >= $currentPage - $range && $i <= $currentPage + $range)) {
+                            ?>
+                            <li class="page-item <?php echo ($i == $currentPage) ? 'active' : ''; ?>">
+                                <a class="page-link" href="<?php echo WEBROOT; ?>/admin/authors?page=<?php echo $i; ?>">
+                                    <?php echo $i; ?>
+                                </a>
+                            </li>
+                            <?php
+                        } 
+                        elseif ($i == $currentPage - $range - 1 || $i == $currentPage + $range + 1) {
+                            ?>
+                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                            <?php
+                        }
+                    }
+                ?>
+
+                <li class="page-item <?php echo ($currentPage >= $totalPages) ? 'disabled' : ''; ?>">
+                    <a class="page-link" href="<?php echo WEBROOT; ?>/admin/authors?page=<?php echo $currentPage + 1; ?>">
+                        <i class="ti ti-chevron-right"></i>
                     </a>
                 </li>
             </ul>
+            <?php endif; ?>
         </div>
-        <?php endif; ?>
-
     </div>
 
 </div>
@@ -328,13 +334,10 @@ function editAuthor(author) {
     document.getElementById('editAuthorNationality').value = author.nationality || '';
     document.getElementById('editAuthorBirthDate').value = author.birth_date || '';
     document.getElementById('editAuthorBiography').value = author.biography || '';
-}
-
-// HÀM XÓA TÁC GIẢ
-function deleteAuthor(id, name) {
-    if (confirm(`Bạn có chắc muốn xóa tác giả "${name}"?\n\nLưu ý: Không thể xóa nếu tác giả có sách.`)) {
-        window.location.href = '<?php echo WEBROOT; ?>/admin/authorDelete/' + id;
-    }
+    
+    // Mở modal
+    const modal = new bootstrap.Modal(document.getElementById('editAuthorModal'));
+    modal.show();
 }
 
 // HÀM XÓA DẤU TIẾNG VIỆT
@@ -353,27 +356,100 @@ function removeVietnameseTones(str) {
     str = str.replace(/Ù|Ú|Ụ|Ủ|Ũ|Ư|Ừ|Ứ|Ự|Ử|Ữ/g, "U");
     str = str.replace(/Ỳ|Ý|Ỵ|Ỷ|Ỹ/g, "Y");
     str = str.replace(/Đ/g, "D");
+    str = str.replace(/\u0300|\u0301|\u0303|\u0309|\u0323/g, ""); 
     return str.toLowerCase().trim();
 }
 
-// TÌM KIẾM TÁC GIẢ
-document.getElementById('searchInput')?.addEventListener('input', function(e) {
-    const keyword = removeVietnameseTones(e.target.value);
-    const rows = document.querySelectorAll('#authorTable tbody tr');
-    
-    rows.forEach(row => {
-        const nameCol = row.cells[0]?.innerText || '';
-        const nationalityCol = row.cells[1]?.innerText || '';
+const allAuthors = <?php echo json_encode($authors); ?>;
+const searchInput = document.getElementById('searchInput');
+const tableBody = document.querySelector('#authorTable tbody');
+const pagination = document.querySelector('.card-footer');
+
+if (searchInput) {
+    searchInput.addEventListener('input', function(e) {
+        const keyword = removeVietnameseTones(e.target.value);
         
-        const rowText = removeVietnameseTones(nameCol + " " + nationalityCol);
-        
-        if (rowText.includes(keyword)) {
-            row.style.display = '';
-        } else {
-            row.style.display = 'none';
+        if (keyword === '') {
+            location.reload();
+            return;
         }
+        
+        if (pagination) {
+            pagination.style.display = 'none';
+        }
+        
+        const filtered = allAuthors.filter(author => {
+            const searchText = removeVietnameseTones(
+                author.author_name + ' ' + 
+                (author.nationality || '') + ' ' + 
+                (author.biography || '')
+            );
+            return searchText.includes(keyword);
+        });
+        
+        renderAuthors(filtered);
     });
-});
+}
+
+function renderAuthors(authors) {
+    if (authors.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4">Không tìm thấy tác giả phù hợp</td></tr>';
+        return;
+    }
+    
+    let html = '';
+    authors.forEach(author => {
+        const birthDate = author.birth_date ? new Date(author.birth_date).toLocaleDateString('vi-VN') : '-';
+        const canDelete = author.book_count == 0;
+        
+        html += `
+            <tr data-author-id="${author.author_id}">
+                <td>
+                    <div class="fw-bold">${escapeHtml(author.author_name)}</div>
+                    ${author.biography ? `<div class="text-muted small text-truncate" style="max-width: 300px;">${escapeHtml(author.biography)}</div>` : ''}
+                </td>
+                <td>
+                    ${author.nationality ? `<span class="badge bg-info-lt">${escapeHtml(author.nationality)}</span>` : '<span class="text-muted small">Chưa cập nhật</span>'}
+                </td>
+                <td class="text-center">
+                    <small>${birthDate}</small>
+                </td>
+                <td class="text-center">
+                    <span class="badge bg-info-lt fs-6">${author.book_count} sách</span>
+                </td>
+                <td class="text-center">
+                    <button class="btn btn-sm btn-icon btn-ghost-primary" 
+                            onclick='editAuthor(${JSON.stringify(author)})'
+                            title="Chỉnh sửa">
+                        <i class="ti ti-edit"></i>
+                    </button>
+                    ${canDelete ? `
+                        <a href="<?php echo WEBROOT; ?>/admin/authorDelete/${author.author_id}" 
+                           class="btn btn-sm btn-icon btn-ghost-danger"
+                           onclick="return confirm('Bạn có chắc muốn xóa tác giả này?')"
+                           title="Xóa">
+                            <i class="ti ti-trash"></i>
+                        </a>
+                    ` : `
+                        <button class="btn btn-sm btn-icon btn-ghost-secondary" 
+                                disabled
+                                title="Không thể xóa vì đang có sách">
+                            <i class="ti ti-lock"></i>
+                        </button>
+                    `}
+                </td>
+            </tr>
+        `;
+    });
+    
+    tableBody.innerHTML = html;
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
 </script>
 
 <style>
