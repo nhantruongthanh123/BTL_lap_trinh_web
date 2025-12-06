@@ -2,14 +2,15 @@
     <nav aria-label="breadcrumb" class="my-4">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="<?php echo WEBROOT; ?>" class="text-decoration-none">Trang chủ</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Sản phẩm</li>
+            <li class="breadcrumb-item"><a href="<?php echo WEBROOT; ?>/product" class="text-decoration-none">Sản phẩm</a></li>
+            <li class="breadcrumb-item active" aria-current="page"><?php echo isset($title) ? $title : 'Danh mục'; ?></li>
         </ol>
     </nav>
 
     <div class="row mb-4">
         <div class="col-12">
             <h2 class="fw-bold text-primary border-bottom pb-2">
-                <i class="fas fa-book me-2"></i><?php echo isset($data['title']) ? $data['title'] : 'Danh sách sản phẩm'; ?>
+                <i class="fas fa-book me-2"></i><?php echo isset($title) ? $title : 'Danh mục sản phẩm'; ?>
             </h2>
         </div>
     </div>
@@ -93,7 +94,7 @@
                 <!-- Nút Previous -->
                 <li class="page-item <?php echo ($currentPage == 1) ? 'disabled' : ''; ?>">
                     <?php if ($currentPage > 1): ?>
-                        <a class="page-link" href="?page=<?php echo $currentPage - 1; ?>">
+                        <a class="page-link" href="<?php echo WEBROOT; ?>/product/category/<?php echo $categorySlug; ?>?page=<?php echo $currentPage - 1; ?>">
                             <i class="fas fa-chevron-left"></i> Trước
                         </a>
                     <?php else: ?>
@@ -106,7 +107,7 @@
                 <?php
                 // Hiển thị trang đầu
                 if ($currentPage > 3) {
-                    echo '<li class="page-item"><a class="page-link" href="?page=1">1</a></li>';
+                    echo '<li class="page-item"><a class="page-link" href="' . WEBROOT . '/product/category/' . $categorySlug . '?page=1">1</a></li>';
                     if ($currentPage > 4) {
                         echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
                     }
@@ -117,7 +118,7 @@
                     if ($i == $currentPage) {
                         echo '<li class="page-item active"><span class="page-link">' . $i . '</span></li>';
                     } else {
-                        echo '<li class="page-item"><a class="page-link" href="?page=' . $i . '">' . $i . '</a></li>';
+                        echo '<li class="page-item"><a class="page-link" href="' . WEBROOT . '/product/category/' . $categorySlug . '?page=' . $i . '">' . $i . '</a></li>';
                     }
                 }
 
@@ -126,14 +127,14 @@
                     if ($currentPage < $totalPage - 3) {
                         echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
                     }
-                    echo '<li class="page-item"><a class="page-link" href="?page=' . $totalPage . '">' . $totalPage . '</a></li>';
+                    echo '<li class="page-item"><a class="page-link" href="' . WEBROOT . '/product/category/' . $categorySlug . '?page=' . $totalPage . '">' . $totalPage . '</a></li>';
                 }
                 ?>
 
                 <!-- Nút Next -->
                 <li class="page-item <?php echo ($currentPage == $totalPage) ? 'disabled' : ''; ?>">
                     <?php if ($currentPage < $totalPage): ?>
-                        <a class="page-link" href="?page=<?php echo $currentPage + 1; ?>">
+                        <a class="page-link" href="<?php echo WEBROOT; ?>/product/category/<?php echo $categorySlug; ?>?page=<?php echo $currentPage + 1; ?>">
                             Sau <i class="fas fa-chevron-right"></i>
                         </a>
                     <?php else: ?>

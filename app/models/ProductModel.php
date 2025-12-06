@@ -16,6 +16,41 @@ class ProductModel extends BaseModel {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function getProductsPaginated($limit = 12, $offset) {
+        $sql = "SELECT b.*, a.author_name, c.category_name
+                FROM {$this->table} b
+                LEFT JOIN authors a ON b.author_id = a.author_id
+                LEFT JOIN categories c ON b.category_id = c.category_id
+                WHERE b.is_active = 1 
+                ORDER BY b.created_at DESC
+                LIMIT :limit OFFSET :offset";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', (int)$offset, PDO::PARAM_INT);
+        $stmt->execute();
+        
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getProductsByCategoryPaginated($slug, $limit = 8, $offset) {
+        $sql = "SELECT b.*, a.author_name, c.category_name, c.slug as category_slug
+                FROM {$this->table} b
+                INNER JOIN categories c ON b.category_id = c.category_id
+                LEFT JOIN authors a ON b.author_id = a.author_id
+                WHERE c.slug = :slug AND b.is_active = 1
+                ORDER BY b.created_at DESC
+                LIMIT :limit OFFSET :offset";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':slug', $slug, PDO::PARAM_STR);
+        $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', (int)$offset, PDO::PARAM_INT);
+        $stmt->execute();
+        
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function getProductsByCategory($slug) {
         $sql = "SELECT b.*, a.author_name, c.category_name, c.slug as category_slug
                 FROM {$this->table} b
@@ -30,6 +65,8 @@ class ProductModel extends BaseModel {
         
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    
 
     public function getBookById($bookId) {
         $sql = "SELECT b.*, 
@@ -67,7 +104,7 @@ class ProductModel extends BaseModel {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function searchBooks($keyword, $limit = 20) {
+    public function searchBooks($keyword, $limit = 12) {
         $sql = "SELECT b.*, a.author_name, c.category_name
                 FROM {$this->table} b
                 LEFT JOIN authors a ON b.author_id = a.author_id
@@ -222,6 +259,17 @@ class ProductModel extends BaseModel {
         
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         return $result ? (int)$result['total'] : 0;
+    }
+
+    public function countProductsByCategory($slug) {
+        $sql = "SELECT COUNT(*) as total 
+                FROM {$this->table} b
+                INNER JOIN categories c ON b.category_id = c.category_id
+                WHERE c.slug = :slug AND b.is_active = 1";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':slug', $slug, PDO::PARAM_STR);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC)['total'];
     }
 
     public function decreaseStock($bookId, $quantity) {
