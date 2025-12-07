@@ -272,6 +272,7 @@ class Product extends BaseController {
         $this->render('Product/search', $data);
         $this->render('Block/footer');
     }
+    
 
 }
 ?>

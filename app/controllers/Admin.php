@@ -7,21 +7,24 @@ class Admin extends BaseController {
     public $publisherModel;
     public $authorModel;
     public $orderModel;
+    public $reviewModel;
 
     public function __construct(){
-        // if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin'){
-        //     header('Location: ' . WEBROOT);
-        //     exit();
-        // }
         $this->userModel = $this->model('UserModel');
         $this->productModel = $this->model('ProductModel');
         $this->categoryModel = $this->model('CategoryModel');
         $this->publisherModel = $this->model('PublisherModel');
         $this->authorModel = $this->model('AuthorModel');
         $this->orderModel = $this->model('OrderModel');
+        $this->reviewModel = $this->model('ReviewModel');
     }
 
     public function index(){
+        if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin'){
+            header('Location: ' . WEBROOT);
+            exit();
+        }
+
         $totalCustomers = $this->userModel->countCustomers();
         $totalOrders = $this->orderModel->countAllOrders();
         $totalBooks = $this->productModel->countAllProducts();
@@ -1108,5 +1111,113 @@ class Admin extends BaseController {
         exit();
     }
 
+    public function reviews(){
+        if (!isset($_SESSION['user_id']) || ($_SESSION['role'] ?? '') !== 'admin') {
+            header('Location: ' . WEBROOT . '/admin/login');
+            exit();
+        }
+
+        $currentPage = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+        $perPage = 10;
+        $offset = ($currentPage - 1) * $perPage;
+
+        $books = $this->reviewModel->getBooksWithReviews();
+        $paginatedBooks = $this->reviewModel->getBooksWithReviewsPaginated($perPage, $offset);
+        $totalBooks = $this->reviewModel->countBooksWithReviews();
+        $totalPages = ceil($totalBooks / $perPage);
+
+        $data = [
+            'title' => 'Quản lý Đánh giá',
+            'page'  => 'reviews',
+            'books' => $books,
+            'paginatedBooks' => $paginatedBooks,
+            'currentPage'=> $currentPage,
+            'totalPages' => $totalPages,
+            'totalBooks' => $totalBooks,
+            'success' => $_SESSION['admin_success'] ?? '',
+            'error'   => $_SESSION['admin_error'] ?? ''
+        ];
+        
+        unset($_SESSION['admin_success'], $_SESSION['admin_error']);
+
+        $this->render('Admin/inc/header', $data);
+        $this->render('Admin/reviews', $data);
+        $this->render('Admin/inc/footer', $data);
+    }
+
+    public function bookReviews($bookId) {
+        if (!isset($_SESSION['user_id']) || ($_SESSION['role'] ?? '') !== 'admin') {
+            header('Location: ' . WEBROOT . '/admin/login');
+            exit();
+        }
+
+        // Lấy thông tin sách
+        $book = $this->productModel->getProductByIdAdmin($bookId);
+        if (!$book) {
+            $_SESSION['admin_error'] = 'Sách không tồn tại!';
+            header('Location: ' . WEBROOT . '/admin/reviews');
+            exit();
+        }
+
+        $currentPage = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+        $perPage = 10;
+        $offset = ($currentPage - 1) * $perPage;
+
+        // Lấy reviews của sách này
+        $reviews = $this->reviewModel->getReviewsByBookIdForAdmin($bookId);
+        $paginatedReviews = $this->reviewModel->getReviewsByBookIdAdminPaginated($bookId, $perPage, $offset);
+        $totalReviews = $this->reviewModel->countReviewsByBookId($bookId);
+        $totalPages = ceil($totalReviews / $perPage);
+
+        // Lấy thống kê rating
+        $ratingStats = $this->reviewModel->getBookRatingStats($bookId);
+
+        $data = [
+            'title' => 'Đánh giá: ' . $book['title'],
+            'page'  => 'reviews',
+            'book' => $book,
+            'reviews' => $reviews,
+            'paginatedReviews' => $paginatedReviews,
+            'currentPage'=> $currentPage,
+            'totalPages' => $totalPages,
+            'totalReviews' => $totalReviews,
+            'ratingStats' => $ratingStats,
+            'success' => $_SESSION['admin_success'] ?? '',
+            'error'   => $_SESSION['admin_error'] ?? ''
+        ];
+        
+        unset($_SESSION['admin_success'], $_SESSION['admin_error']);
+
+        $this->render('Admin/inc/header', $data);
+        $this->render('Admin/bookReviews', $data);
+        $this->render('Admin/inc/footer', $data);
+    }
+
+    public function deleteReview($reviewId) {
+        if (!isset($_SESSION['user_id']) || ($_SESSION['role'] ?? '') !== 'admin') {
+            header('Location: ' . WEBROOT . '/admin/login');
+            exit();
+        }
+
+        // Lấy thông tin review để biết book_id
+        $review = $this->reviewModel->getReviewById($reviewId);
+        $bookId = $review['book_id'] ?? null;
+
+        $result = $this->reviewModel->deleteReviewByAdmin($reviewId);
+
+        if ($result) {
+            $_SESSION['admin_success'] = 'Xóa đánh giá thành công!';
+        } else {
+            $_SESSION['admin_error'] = 'Xóa đánh giá thất bại!';
+        }
+
+        // Redirect về trang reviews của sách đó
+        if ($bookId) {
+            header('Location: ' . WEBROOT . '/admin/bookReviews/' . $bookId);
+        } else {
+            header('Location: ' . WEBROOT . '/admin/reviews');
+        }
+        exit();
+    }
 
 }

@@ -4,16 +4,13 @@ class Order extends BaseController {
     public $productModel;
     public $orderModel;
     public $couponModel;
-    private $db;
+    
 
     public function __construct() {
         $this->userModel = $this->model('UserModel');
         $this->productModel = $this->model('ProductModel');
         $this->orderModel = $this->model('OrderModel');
         $this->couponModel = $this->model('CouponModel');
-        if(class_exists('Database')){
-            $this->db = Database::getInstance()->getConnection();
-        }
     }
 
     public function checkout() {
@@ -69,7 +66,6 @@ class Order extends BaseController {
             header('Location: ' . WEBROOT . '/user/login');
             exit();
         }
-        file_put_contents('debug.txt', "OK: User ID = " . $_SESSION['user_id'] . "\n", FILE_APPEND);
 
         // 2. Kiểm tra giỏ hàng
         if (empty($_SESSION['cart'])) {
@@ -77,7 +73,6 @@ class Order extends BaseController {
             header('Location: ' . WEBROOT . '/cart');
             exit();
         }
-        file_put_contents('debug.txt', "OK: Cart has items\n", FILE_APPEND);
 
         // 3. Validate input
         if (empty($_POST['shipping_address'])) {
@@ -85,8 +80,6 @@ class Order extends BaseController {
             header('Location: ' . WEBROOT . '/order/checkout');
             exit();
         }
-        file_put_contents('debug.txt', "OK: Shipping address = " . $_POST['shipping_address'] . "\n", FILE_APPEND);
-
         $userId = $_SESSION['user_id'];
         $shippingAddress = trim($_POST['shipping_address']);
         $note = trim($_POST['note'] ?? '');
@@ -117,10 +110,7 @@ class Order extends BaseController {
                 exit();
             }
         }
-        file_put_contents('debug.txt', "OK: Total amount = $totalAmount\n", FILE_APPEND);
 
-
-        // 5. Xử lý coupon
         $shippingFee = 15000;
         $discountAmount = 0;
 
@@ -132,28 +122,19 @@ class Order extends BaseController {
                 
                 if ($coupon['discount_type'] == 'free_shipping') {
                     $shippingFee = 0;
-                    $discountAmount = 15000; // Giá trị miễn phí ship
+                    $discountAmount = 15000;
                 } elseif ($coupon['discount_type'] == 'fixed_amount') {
                     $discountAmount = $coupon['discount_value'];
                 }
             } else {
-                // Coupon không hợp lệ, bỏ qua
                 $couponCode = null;
             }
         }
 
         $finalAmount = $totalAmount + $shippingFee - $discountAmount;
-        file_put_contents('debug.txt', "Final amount = $finalAmount\n", FILE_APPEND);
-
-        // 6. Tạo order number duy nhất
         $orderNumber = 'ORD-' . date('Ymd') . '-' . strtoupper(substr(uniqid(), -6));
-        file_put_contents('debug.txt', "Order number = $orderNumber\n", FILE_APPEND);
-        // 7. Lưu order vào database
-        try {
-            $this->db->beginTransaction();
 
-            // Insert order
-            $orderData = [
+        $orderData = [
                 'user_id' => $userId,
                 'order_number' => $orderNumber,
                 'total_amount' => $totalAmount,
@@ -167,42 +148,36 @@ class Order extends BaseController {
                 'note' => $note,
                 'coupon_code' => $couponCode
             ];
-            file_put_contents('debug.txt', "Creating order...\n", FILE_APPEND);
+
+
+        $db = $this->orderModel->getDbConnection();
+
+        try {
+            $db->beginTransaction();
+
             $orderId = $this->orderModel->createOrder($orderData);
-            
 
             if (!$orderId) {
-                throw new Exception('Không thể tạo đơn hàng');
+                throw new Exception("Không thể tạo bản ghi đơn hàng chính.");
             }
 
-            // Insert order items
             foreach ($orderItems as $item) {
                 $item['order_id'] = $orderId;
                 $this->orderModel->addOrderItem($item);
 
-                // Giảm số lượng sản phẩm trong kho
                 $this->productModel->decreaseStock($item['book_id'], $item['quantity']);
             }
-            file_put_contents('debug.txt', "Order items added\n", FILE_APPEND);
 
-            $this->db->commit();
-            file_put_contents('debug.txt', "Transaction committed\n", FILE_APPEND);
+            $db->commit();
 
-            // 8. Xóa giỏ hàng
             unset($_SESSION['cart']);
-    
-            // 9. Thông báo thành công và chuyển hướng
             $_SESSION['success'] = 'Đặt hàng thành công! Mã đơn hàng: ' . $orderNumber;
-            file_put_contents('debug.txt', "SUCCESS! Redirecting to success page...\n", FILE_APPEND);
             header('Location: ' . WEBROOT . '/order/success/' . $orderId);
             exit();
 
         } catch (Exception $e) {
-            $this->db->rollBack();
-            file_put_contents('debug.txt', "EXCEPTION: " . $e->getMessage() . "\n", FILE_APPEND);
-            file_put_contents('debug.txt', "File: " . $e->getFile() . " Line: " . $e->getLine() . "\n", FILE_APPEND);
-            file_put_contents('debug.txt', "Trace: " . $e->getTraceAsString() . "\n", FILE_APPEND);
-            $_SESSION['error'] = 'Đặt hàng thất bại: ' . $e->getMessage();
+            $db->rollBack();
+            $_SESSION['error'] = 'Đặt hàng thất bại, đã xảy ra lỗi. Vui lòng thử lại.';
             header('Location: ' . WEBROOT . '/order/checkout');
             exit();
         }

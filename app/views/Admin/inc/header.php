@@ -106,6 +106,15 @@
                 </a>
               </li>
 
+              <li class="nav-item">
+                <a class="nav-link" href="<?php echo WEBROOT; ?>/admin/reviews">
+                  <span class="nav-link-icon d-md-none d-lg-inline-block">
+                    <i class="ti ti-message-star"></i>
+                  </span>
+                  <span class="nav-link-title">Review</span>
+                </a>
+              </li>
+
             </ul>
           </div>
         </div>

@@ -1,9 +1,11 @@
 <?php
 class Cart extends BaseController {
     public $productModel;
+    public $categoryModel;
 
     public function __construct() {
         $this->productModel = $this->model('ProductModel');
+        $this->categoryModel = $this->model('CategoryModel');
 
         if (!isset($_SESSION['cart'])) {
             $_SESSION['cart'] = [];
@@ -40,6 +42,7 @@ class Cart extends BaseController {
         $data = [
             'title' => 'Giỏ hàng của bạn',
             'page'  => 'cart',
+            'categories' => $this->categoryModel->getAllCategories(),
             'cart_items' => $products,
             'total_price' => $totalPrice
         ];
