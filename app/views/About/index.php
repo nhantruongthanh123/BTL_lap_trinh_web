@@ -97,7 +97,7 @@
             </p>
         </div>
         <div class="col-lg-6 text-center">
-            <img src="/BTL_LAP_TRINH_WEB/public/images/AAA.jpg" 
+            <img src="/Bookstore/public/images/AAA.jpg" 
             class="img-fluid shadow-lg hero-img w-100" 
             alt="Bookstore Library">
         </div>

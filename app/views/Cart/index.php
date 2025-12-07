@@ -125,14 +125,14 @@
                         
                         <div class="d-flex justify-content-between mb-3">
                             <span class="text-muted">Phí vận chuyển:</span>
-                            <span class="text-success fw-bold">Miễn phí</span>
+                            <span class="text-success fw-bold"><?php echo number_format(15000, 0, ',', '.'); ?> ₫</span>
                         </div>
                         
                         <hr>
                         
                         <div class="d-flex justify-content-between mb-4 align-items-center">
                             <span class="fs-5 fw-bold text-dark">Tổng cộng:</span>
-                            <span class="fs-3 fw-bold text-danger"><?php echo number_format($total_price, 0, ',', '.'); ?> ₫</span>
+                            <span class="fs-3 fw-bold text-danger"><?php echo number_format($total_price + 15000, 0, ',', '.'); ?> ₫</span>
                         </div>
 
                         <div class="d-grid gap-2">
