@@ -71,7 +71,10 @@
     <div class="container">
         <h1 class="fw-bold display-5">Liên hệ với <span class="text-primary">Bookstore</span></h1>
         <p class="lead text-muted mx-auto" style="max-width: 600px;">
-            Chúng tôi luôn sẵn sàng lắng nghe ý kiến đóng góp của bạn. Hãy để lại lời nhắn, đội ngũ hỗ trợ sẽ phản hồi trong vòng 24h.
+            Chúng tôi luôn sẵn sàng lắng nghe ý kiến đóng góp của bạn. 
+        </p>
+        <p class="lead text-muted mx-auto" style="max-width: 600px;">
+        Hãy để lại lời nhắn, đội ngũ hỗ trợ sẽ phản hồi trong vòng 24h.
         </p>
     </div>
 </div>
