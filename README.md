@@ -30,7 +30,7 @@ git clone https://github.com/nhantruongthanh123/BTL_lap_trinh_web
 ### 3. Import database lên server
 - Bật XAMPP và khởi động Apache và MySQL
 - Mở admin ở MySQL để khởi động http://localhost/phpmyadmin/
-- Import lần lượt ở thư mục Bookstore/Database hai file database_schema và data.sql để gửi dữ liệu lên server
+- Import lần lượt ở thư mục Bookstore/Database hai file bookstore_db để gửi dữ liệu lên server
 - Khi này sẽ xuất hiện bảng bookstore_db lưu dữ liệu của dự án
 
 ### 4. Truy cập web
