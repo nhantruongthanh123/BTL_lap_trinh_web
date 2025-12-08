@@ -71,11 +71,25 @@
                             </div>
 
                             
-                            <div class="d-grid gap-2">
-                                <button class="btn btn-primary btn-sm">
-                                    <i class="fas fa-cart-plus me-1"></i> Thêm giỏ hàng
-                                </button>
-                            </div>
+                            <form action="<?php echo WEBROOT; ?>/cart/add" method="POST">
+                                <input type="hidden" name="product_id" value="<?php echo (int)$book['book_id']; ?>">
+                                <input type="hidden" name="quantity" value="1">
+                                
+                                <?php if (isset($book['stock_quantity']) && $book['stock_quantity'] > 0): ?>
+                                    <div class="d-grid gap-2">
+                                        <button type="submit" class="btn btn-primary btn-sm">
+                                            <i class="fas fa-cart-plus me-1"></i> Thêm giỏ hàng
+                                        </button>
+                                    </div>
+                                <?php else: ?>
+                                    <div class="d-grid gap-2">
+                                        <button type="button" class="btn btn-secondary btn-sm" disabled>
+                                            <i class="fas fa-ban me-1"></i> Hết hàng
+                                        </button>
+                                    </div>
+                                <?php endif; ?>
+                            </form>
+
                         </div>
                     </div>
                 </div>

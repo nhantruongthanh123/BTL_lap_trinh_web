@@ -312,7 +312,7 @@ class User extends BaseController {
             $avatarFileName = 'avatar_' . $userId . '_' . time() . '.' . $extension;
             
             // 4. ĐƯỜNG DẪN LƯU FILE
-            $uploadDir = ROOT . '/../../public/assets/Clients/avatars/';
+            $uploadDir = ROOT . '/public/assets/Clients/avatars/';
             $uploadPath = $uploadDir . $avatarFileName;
             
             // 5. TẠO THƯ MỤC NẾU CHƯA TỒN TẠI

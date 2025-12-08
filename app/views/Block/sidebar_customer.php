@@ -62,7 +62,7 @@
                         </li>
 
                         <li class="mb-3">
-                            <a href="<?php echo WEBROOT; ?>/order/history" 
+                            <a href="<?php echo WEBROOT; ?>/user/orderHistory" 
                             class="text-decoration-none d-flex align-items-center <?php echo (isset($active_tab) && $active_tab == 'order') ? 'text-danger fw-bold' : 'text-dark'; ?>">
                                 <i class="fas fa-file-invoice-dollar text-primary me-2" style="width: 20px;"></i>
                                 <span>Đơn hàng của tôi</span>

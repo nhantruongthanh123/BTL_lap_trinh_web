@@ -30,7 +30,6 @@ class App{
         $urlarr = array_filter(explode('/',$url));
         $urlarr = array_values($urlarr);
         
-        // Controller
         if (!empty($urlarr[0])) {
             $this->__controller = ucfirst($urlarr[0]);
         }
@@ -41,7 +40,7 @@ class App{
         if (file_exists('app/controllers/'.($this->__controller).'.php')) {
             require_once 'app/controllers/'.($this->__controller).'.php';
 
-            // Check class exists
+
             if (!class_exists($this->__controller)) {
                 $this->loadError('404');
                 return;
@@ -55,13 +54,13 @@ class App{
             return;
         } 
 
-        // Action
+
         if (!empty($urlarr[1])) {
             $this->__action = $urlarr[1];
             unset($urlarr[1]);
         }
         
-        // Check action exists
+
         if (method_exists($this->__controller, $this->__action)) {
             $this->__params = array_values($urlarr);
             call_user_func_array([$this->__controller, $this->__action], $this->__params);
