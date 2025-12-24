@@ -92,8 +92,9 @@
             </p>
             <p class="text-muted">
                 <i class="fas fa-check-circle text-success me-2"></i>Sách bản quyền 100%<br>
-                <i class="fas fa-check-circle text-success me-2"></i>Giá ưu đãi cho sinh viên<br>
-                <i class="fas fa-check-circle text-success me-2"></i>Không gian đọc sách hiện đại
+                <i class="fas fa-check-circle text-success me-2"></i>Giá cả ưu đãi cho sinh viên<br>
+                <i class="fas fa-check-circle text-success me-2"></i>Không gian đọc sách hiện đại<br>
+                <i class="fas fa-check-circle text-success me-2"></i>Đội ngũ hỗ trợ thân thiện và tận tâm
             </p>
         </div>
         <div class="col-lg-6 text-center">
